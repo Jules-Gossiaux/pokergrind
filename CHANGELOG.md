@@ -59,3 +59,7 @@ encore de version publiée.
 - matrice statistique 13 × 13 remplie selon la réussite de chaque main ;
 - sélection de la position dans les statistiques et le mode libre ;
 - actions d'accueil compactées pour préserver l'espace du parcours.
+- abandon explicite d'une session libre depuis l'écran d'entraînement ;
+- passage direct du mode libre à une nouvelle session guidée ;
+- défilement du sélecteur de spots avec bouton Retour toujours accessible ;
+- boutons Voir la range et Continuer alignés à taille identique.

@@ -160,7 +160,6 @@ fun HomeScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),
-                enabled = activeSession?.mode != TrainingMode.FREE,
                 shape = RoundedCornerShape(20.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.primary,
@@ -170,6 +169,8 @@ fun HomeScreen(
                 Text(
                     if (activeSession?.mode == TrainingMode.GUIDED) {
                         "Reprendre le guidé · ${activeSession.questionIndex + 1}/20"
+                    } else if (activeSession?.mode == TrainingMode.FREE) {
+                        "Passer à la session guidée"
                     } else {
                         "Session guidée · 20 questions"
                     },

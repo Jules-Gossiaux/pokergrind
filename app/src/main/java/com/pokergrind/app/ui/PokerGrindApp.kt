@@ -105,7 +105,11 @@ fun PokerGrindApp(viewModel: PokerGrindViewModel = viewModel()) {
                         else -> viewModel.startGuidedSession()
                     }
                 },
-                onBack = { destination = Destination.HOME },
+                onBack = {
+                    viewModel.leaveTraining {
+                        destination = Destination.HOME
+                    }
+                },
             )
         }
     }

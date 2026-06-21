@@ -255,17 +255,21 @@ private fun ColumnScope.QuestionContent(
                 Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                     OutlinedButton(
                         onClick = onShowRange,
-                        modifier = Modifier.weight(1f),
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(60.dp),
                         shape = RoundedCornerShape(16.dp),
                     ) {
-                        Text("Voir la range")
+                        Text("Voir la range", maxLines = 1, fontSize = 15.sp)
                     }
                     Button(
                         onClick = onNext,
-                        modifier = Modifier.weight(1f),
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(60.dp),
                         shape = RoundedCornerShape(16.dp),
                     ) {
-                        Text("Continuer")
+                        Text("Continuer", maxLines = 1, fontSize = 15.sp)
                     }
                 }
             }

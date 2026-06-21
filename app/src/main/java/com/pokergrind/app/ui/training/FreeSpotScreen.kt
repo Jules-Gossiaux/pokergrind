@@ -7,7 +7,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -33,9 +35,12 @@ fun FreeSpotScreen(
         modifier = Modifier
             .fillMaxSize()
             .padding(horizontal = 22.dp, vertical = 34.dp),
-        verticalArrangement = Arrangement.SpaceBetween,
     ) {
-        Column {
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .verticalScroll(rememberScrollState()),
+        ) {
             Text("ENTRAÎNEMENT LIBRE", color = MaterialTheme.colorScheme.primary)
             Spacer(Modifier.height(8.dp))
             Text("Choisis ton spot", style = MaterialTheme.typography.headlineLarge)
@@ -57,6 +62,7 @@ fun FreeSpotScreen(
                 )
                 Spacer(Modifier.height(10.dp))
             }
+            Spacer(Modifier.height(12.dp))
         }
 
         OutlinedButton(

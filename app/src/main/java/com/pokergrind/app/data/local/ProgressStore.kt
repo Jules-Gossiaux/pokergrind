@@ -67,6 +67,18 @@ class ProgressStore(private val context: Context) {
         }
     }
 
+    suspend fun discardSession() {
+        context.progressDataStore.edit { preferences ->
+            preferences.remove(SESSION_ID)
+            preferences.remove(SESSION_MODE)
+            preferences.remove(SESSION_QUESTIONS)
+            preferences.remove(LEGACY_SESSION_HANDS)
+            preferences.remove(SESSION_INDEX)
+            preferences.remove(SESSION_CORRECT)
+            preferences.remove(SESSION_SELECTED_ACTION)
+        }
+    }
+
     suspend fun answer(action: PokerAction, isCorrect: Boolean) {
         context.progressDataStore.edit { preferences ->
             if (preferences[SESSION_SELECTED_ACTION] != null) return@edit
