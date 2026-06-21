@@ -29,3 +29,5 @@ encore de version publiée.
 - chemin visuel Fondations avec les cinq spots d'open ;
 - amélioration du contraste, de la palette et de la hiérarchie visuelle ;
 - action explicite `Open 2,5 BB` dans l'entraînement.
+- critère de déblocage du prochain spot affiché dans le parcours ;
+- connecteurs du parcours conservés neutres tant que le spot suivant est verrouillé.

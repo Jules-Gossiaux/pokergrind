@@ -104,6 +104,10 @@ Les nombres exacts requis pour la couverture par action seront calibrés avec
 les données réelles des ranges. Ils ne doivent pas rendre impossible la
 maîtrise d'une range très déséquilibrée.
 
+Dans le parcours, l'objectif principal est formulé simplement comme
+`27 bonnes réponses sur les 30 dernières`. La condition de diversité reste
+contrôlée par le moteur, sans alourdir l'écran principal.
+
 ## 8. Progression et statistiques
 
 La V1 comprend :

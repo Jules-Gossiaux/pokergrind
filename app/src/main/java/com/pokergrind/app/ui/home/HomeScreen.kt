@@ -108,7 +108,7 @@ fun HomeScreen(
                 style = MaterialTheme.typography.headlineMedium,
             )
             Text(
-                text = "Maîtrise chaque position pour débloquer la suivante.",
+                text = "Le prochain spot se débloque à 90 % de réussite sur tes 30 dernières réponses.",
                 color = TextSecondary,
             )
 
@@ -121,6 +121,7 @@ fun HomeScreen(
                     "Session en cours · ${(it.questionIndex + 1).coerceAtMost(it.hands.size)}/${it.hands.size}"
                 } ?: "${range.stackDepthBb} BB · Open 2,5 BB",
                 isActive = true,
+                unlockHint = "Objectif : 27 bonnes réponses sur les 30 dernières",
             )
             PathStep(number = 2, title = "Open CO", subtitle = "À débloquer")
             PathStep(number = 3, title = "Open HJ", subtitle = "À débloquer")
@@ -182,6 +183,7 @@ private fun PathStep(
     title: String,
     subtitle: String,
     isActive: Boolean = false,
+    unlockHint: String? = null,
     showConnector: Boolean = true,
 ) {
     Row(
@@ -208,7 +210,7 @@ private fun PathStep(
                 Box(
                     modifier = Modifier
                         .size(width = 2.dp, height = 28.dp)
-                        .background(if (isActive) MaterialTheme.colorScheme.primary.copy(alpha = 0.4f) else SurfaceElevated),
+                        .background(SurfaceElevated),
                 )
             }
         }
@@ -234,6 +236,14 @@ private fun PathStep(
                     color = if (isActive) MaterialTheme.colorScheme.primary else TextSecondary.copy(alpha = 0.65f),
                     fontSize = 14.sp,
                 )
+                if (unlockHint != null) {
+                    Spacer(Modifier.height(5.dp))
+                    Text(
+                        text = unlockHint,
+                        color = TextSecondary,
+                        fontSize = 12.sp,
+                    )
+                }
             }
         }
     }
