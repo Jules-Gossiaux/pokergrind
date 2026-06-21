@@ -7,7 +7,7 @@ Cette feuille de route décrit l'ordre de travail, pas des dates de livraison.
 - documentation initiale — réalisé ;
 - projet Android et build Gradle — réalisé ;
 - thème sombre et composants fondamentaux — réalisé ;
-- stockage local et navigation ;
+- stockage DataStore de la progression et navigation — réalisé ;
 - format structuré et validation des ranges — réalisé pour Open BTN.
 
 ## Étape 1 — Open BTN vertical
@@ -16,7 +16,8 @@ Cette feuille de route décrit l'ordre de travail, pas des dates de livraison.
 - session d'entraînement Open / Fold — réalisé sans persistance ;
 - feedback immédiat — réalisé ;
 - matrice `Voir la range` — réalisé ;
-- historique local minimal ;
+- persistance de la session, XP et série — réalisé ;
+- historique détaillé des réponses — à réaliser avec Room ;
 - tests du domaine — réalisés ;
 - test du parcours sur émulateur ou appareil — à réaliser.
 

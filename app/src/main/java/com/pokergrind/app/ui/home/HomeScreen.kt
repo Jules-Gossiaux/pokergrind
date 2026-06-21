@@ -11,8 +11,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -24,35 +26,54 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.pokergrind.app.data.local.StoredTrainingSession
 import com.pokergrind.app.domain.model.RangeDefinition
 import com.pokergrind.app.ui.theme.Progress
 import com.pokergrind.app.ui.theme.SurfaceElevated
+import com.pokergrind.app.ui.theme.SurfaceSoft
 import com.pokergrind.app.ui.theme.TextSecondary
 
 @Composable
 fun HomeScreen(
     range: RangeDefinition,
+    xp: Int,
+    streak: Int,
+    activeSession: StoredTrainingSession?,
     onStartTraining: () -> Unit,
 ) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 24.dp, vertical = 36.dp),
-        verticalArrangement = Arrangement.SpaceBetween,
+            .padding(horizontal = 22.dp)
+            .padding(top = 34.dp, bottom = 20.dp),
     ) {
-        Column {
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .verticalScroll(rememberScrollState()),
+        ) {
             Text(
-                text = "PokerGrind",
+                text = "POKERGRIND",
+                color = MaterialTheme.colorScheme.primary,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Bold,
+                letterSpacing = 2.2.sp,
+            )
+            Spacer(Modifier.height(5.dp))
+            Text(
+                text = "Construis tes réflexes.",
                 style = MaterialTheme.typography.headlineLarge,
             )
             Text(
-                text = "Les bons choix. Jusqu’au réflexe.",
+                text = "Une décision à la fois, jusqu’à ce qu’elle devienne automatique.",
                 color = TextSecondary,
                 style = MaterialTheme.typography.bodyLarge,
             )
 
-            Spacer(Modifier.height(40.dp))
+            Spacer(Modifier.height(26.dp))
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -60,78 +81,73 @@ fun HomeScreen(
             ) {
                 StatCard(
                     modifier = Modifier.weight(1f),
-                    value = "0",
-                    label = "XP",
+                    value = xp.toString(),
+                    label = "XP gagnés",
                     accent = Progress,
                 )
                 StatCard(
                     modifier = Modifier.weight(1f),
-                    value = "0",
-                    label = "Série",
+                    value = streak.toString(),
+                    label = if (streak > 1) "jours de série" else "jour de série",
                     accent = MaterialTheme.colorScheme.primary,
                 )
             }
 
-            Spacer(Modifier.height(28.dp))
+            Spacer(Modifier.height(30.dp))
 
             Text(
-                text = "Ton parcours",
+                text = "FONDATIONS",
+                color = TextSecondary,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Bold,
+                letterSpacing = 2.sp,
+            )
+            Spacer(Modifier.height(6.dp))
+            Text(
+                text = "Ranges d’open",
                 style = MaterialTheme.typography.headlineMedium,
             )
-            Spacer(Modifier.height(14.dp))
+            Text(
+                text = "Maîtrise chaque position pour débloquer la suivante.",
+                color = TextSecondary,
+            )
 
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(28.dp),
-                colors = CardDefaults.cardColors(containerColor = SurfaceElevated),
-            ) {
-                Column(Modifier.padding(22.dp)) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(12.dp),
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .size(44.dp)
-                                .background(MaterialTheme.colorScheme.primary, CircleShape),
-                            contentAlignment = Alignment.Center,
-                        ) {
-                            Text(
-                                text = "1",
-                                color = MaterialTheme.colorScheme.onPrimary,
-                                fontWeight = FontWeight.Bold,
-                            )
-                        }
-                        Column {
-                            Text(range.title, style = MaterialTheme.typography.titleLarge)
-                            Text(
-                                text = "${range.stackDepthBb} BB · Open ${range.sizingBb} BB",
-                                color = TextSecondary,
-                            )
-                        }
-                    }
+            Spacer(Modifier.height(18.dp))
 
-                    Spacer(Modifier.height(20.dp))
-                    Text(
-                        text = "Apprends la première range du parcours avec des décisions Open ou Fold.",
-                        color = TextSecondary,
-                    )
-                }
-            }
+            PathStep(
+                number = 1,
+                title = "Open BTN",
+                subtitle = activeSession?.let {
+                    "Session en cours · ${(it.questionIndex + 1).coerceAtMost(it.hands.size)}/${it.hands.size}"
+                } ?: "${range.stackDepthBb} BB · Open 2,5 BB",
+                isActive = true,
+            )
+            PathStep(number = 2, title = "Open CO", subtitle = "À débloquer")
+            PathStep(number = 3, title = "Open HJ", subtitle = "À débloquer")
+            PathStep(number = 4, title = "Open UTG", subtitle = "À débloquer")
+            PathStep(number = 5, title = "Open SB", subtitle = "À débloquer", showConnector = false)
+
+            Spacer(Modifier.height(16.dp))
         }
 
         Button(
             onClick = onStartTraining,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(64.dp),
-            shape = RoundedCornerShape(24.dp),
+                .height(62.dp),
+            shape = RoundedCornerShape(20.dp),
             colors = ButtonDefaults.buttonColors(
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary,
             ),
         ) {
-            Text("Commencer l’entraînement")
+            Text(
+                text = if (activeSession != null) {
+                    "Reprendre · ${activeSession.questionIndex + 1}/20"
+                } else {
+                    "Commencer la session"
+                },
+            )
         }
     }
 }
@@ -145,12 +161,80 @@ private fun StatCard(
 ) {
     Card(
         modifier = modifier,
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        shape = RoundedCornerShape(22.dp),
+        colors = CardDefaults.cardColors(containerColor = SurfaceSoft),
+        shape = RoundedCornerShape(20.dp),
     ) {
-        Column(Modifier.padding(18.dp)) {
+        Column(Modifier.padding(horizontal = 18.dp, vertical = 16.dp)) {
             Text(value, color = accent, style = MaterialTheme.typography.headlineMedium)
-            Text(label, color = TextSecondary)
+            Text(
+                text = label,
+                color = TextSecondary,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
+    }
+}
+
+@Composable
+private fun PathStep(
+    number: Int,
+    title: String,
+    subtitle: String,
+    isActive: Boolean = false,
+    showConnector: Boolean = true,
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.Top,
+    ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Box(
+                modifier = Modifier
+                    .size(42.dp)
+                    .background(
+                        color = if (isActive) MaterialTheme.colorScheme.primary else SurfaceElevated,
+                        shape = CircleShape,
+                    ),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(
+                    text = number.toString(),
+                    color = if (isActive) MaterialTheme.colorScheme.onPrimary else TextSecondary,
+                    fontWeight = FontWeight.Bold,
+                )
+            }
+            if (showConnector) {
+                Box(
+                    modifier = Modifier
+                        .size(width = 2.dp, height = 28.dp)
+                        .background(if (isActive) MaterialTheme.colorScheme.primary.copy(alpha = 0.4f) else SurfaceElevated),
+                )
+            }
+        }
+
+        Card(
+            modifier = Modifier
+                .padding(start = 12.dp, bottom = 10.dp)
+                .fillMaxWidth(),
+            colors = CardDefaults.cardColors(
+                containerColor = if (isActive) SurfaceElevated else Color.Transparent,
+            ),
+            shape = RoundedCornerShape(18.dp),
+        ) {
+            Column(Modifier.padding(horizontal = 16.dp, vertical = 11.dp)) {
+                Text(
+                    text = title,
+                    color = if (isActive) MaterialTheme.colorScheme.onSurface else TextSecondary,
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 17.sp,
+                )
+                Text(
+                    text = subtitle,
+                    color = if (isActive) MaterialTheme.colorScheme.primary else TextSecondary.copy(alpha = 0.65f),
+                    fontSize = 14.sp,
+                )
+            }
         }
     }
 }

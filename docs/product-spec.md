@@ -115,8 +115,15 @@ La V1 comprend :
 - progression et état de maîtrise de chaque spot.
 
 Règle initiale d'XP : une bonne réponse rapporte de l'XP ; aucune mécanique
-d'achat, de classement, de badge complexe ou de sanction n'est prévue. Le
-barème précis sera fixé avant l'implémentation de la progression.
+d'achat, de classement, de badge complexe ou de sanction n'est prévue.
+
+Barème du premier incrément :
+
+- une bonne réponse rapporte 10 XP ;
+- une erreur ne retire pas d'XP ;
+- la série est validée une seule fois par jour, à la fin des 20 questions ;
+- une session interrompue reprend à la question exacte, avec son score et son
+  feedback conservés.
 
 ## 9. Hors périmètre
 

@@ -22,3 +22,10 @@ encore de version publiée.
 - session locale de 20 questions Open/Fold ;
 - feedback immédiat et matrice de range native ;
 - tests unitaires des 169 mains et des 602 combinaisons ouvertes.
+- persistance DataStore de la session en cours, de l'XP et de la série ;
+- reprise d'une session à la question exacte après navigation ou redémarrage ;
+- attribution de 10 XP par bonne réponse ;
+- mise à jour de la série à la fin d'une session quotidienne complète ;
+- chemin visuel Fondations avec les cinq spots d'open ;
+- amélioration du contraste, de la palette et de la hiérarchie visuelle ;
+- action explicite `Open 2,5 BB` dans l'entraînement.

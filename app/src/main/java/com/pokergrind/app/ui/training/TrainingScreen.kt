@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -29,34 +30,40 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.pokergrind.app.data.local.ProgressStore
+import com.pokergrind.app.data.local.StoredTrainingSession
 import com.pokergrind.app.domain.model.HandCategory
 import com.pokergrind.app.domain.model.PokerAction
 import com.pokergrind.app.domain.model.RangeDefinition
 import com.pokergrind.app.ui.range.RangeDialog
 import com.pokergrind.app.ui.theme.Error
+import com.pokergrind.app.ui.theme.Progress
 import com.pokergrind.app.ui.theme.Success
 import com.pokergrind.app.ui.theme.SurfaceElevated
+import com.pokergrind.app.ui.theme.SurfaceSoft
 import com.pokergrind.app.ui.theme.TextSecondary
 import kotlinx.coroutines.delay
-
-private const val SESSION_SIZE = 20
 
 @Composable
 fun TrainingScreen(
     range: RangeDefinition,
+    session: StoredTrainingSession?,
+    onAnswer: (PokerAction) -> Unit,
+    onNext: () -> Unit,
+    onRestart: () -> Unit,
     onBack: () -> Unit,
 ) {
-    var sessionGeneration by remember { mutableIntStateOf(0) }
-    val questions = remember(range.id, sessionGeneration) { createBalancedSession(range) }
-    var questionIndex by remember { mutableIntStateOf(0) }
-    var selectedAction by remember { mutableStateOf<PokerAction?>(null) }
-    var correctCount by remember { mutableIntStateOf(0) }
     var showRange by remember { mutableStateOf(false) }
-
-    val isFinished = questionIndex >= questions.size
-    val currentHand = questions.getOrNull(questionIndex)
+    val currentHand = session?.let { currentSession ->
+        currentSession.hands
+            .getOrNull(currentSession.questionIndex)
+            ?.let { notation -> range.entries.firstOrNull { it.hand.notation == notation }?.hand }
+    }
 
     if (showRange) {
         RangeDialog(
@@ -70,35 +77,22 @@ fun TrainingScreen(
         modifier = Modifier
             .fillMaxSize()
             .systemBarsPadding()
-            .padding(20.dp),
+            .padding(horizontal = 20.dp, vertical = 16.dp),
     ) {
-        if (isFinished) {
-            SessionSummary(
-                correctCount = correctCount,
-                onRestart = {
-                    sessionGeneration++
-                    questionIndex = 0
-                    selectedAction = null
-                    correctCount = 0
-                },
+        when {
+            session == null -> LoadingSession()
+            session.isComplete -> SessionSummary(
+                correctCount = session.correctCount,
+                onRestart = onRestart,
                 onBack = onBack,
             )
-        } else if (currentHand != null) {
-            QuestionContent(
+
+            currentHand != null -> QuestionContent(
                 range = range,
                 hand = currentHand,
-                questionIndex = questionIndex,
-                selectedAction = selectedAction,
-                onAnswer = { action ->
-                    if (selectedAction == null) {
-                        selectedAction = action
-                        if (action == range.actionFor(currentHand)) correctCount++
-                    }
-                },
-                onNext = {
-                    questionIndex++
-                    selectedAction = null
-                },
+                session = session,
+                onAnswer = onAnswer,
+                onNext = onNext,
                 onShowRange = { showRange = true },
                 onBack = onBack,
             )
@@ -107,16 +101,26 @@ fun TrainingScreen(
 }
 
 @Composable
+private fun LoadingSession() {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center,
+    ) {
+        CircularProgressIndicator()
+    }
+}
+
+@Composable
 private fun ColumnScope.QuestionContent(
     range: RangeDefinition,
     hand: HandCategory,
-    questionIndex: Int,
-    selectedAction: PokerAction?,
+    session: StoredTrainingSession,
     onAnswer: (PokerAction) -> Unit,
     onNext: () -> Unit,
     onShowRange: () -> Unit,
     onBack: () -> Unit,
 ) {
+    val selectedAction = session.selectedAction
     val expectedAction = range.actionFor(hand)
     val isCorrect = selectedAction == expectedAction
     var elapsedSeconds by remember(hand.notation) { mutableIntStateOf(0) }
@@ -133,22 +137,26 @@ private fun ColumnScope.QuestionContent(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
-        OutlinedButton(onClick = onBack) {
+        OutlinedButton(
+            onClick = onBack,
+            shape = RoundedCornerShape(16.dp),
+        ) {
             Text("Quitter")
         }
         Text(
-            text = "${questionIndex + 1} / $SESSION_SIZE",
+            text = "${session.questionIndex + 1} / ${session.hands.size}",
             color = TextSecondary,
             fontWeight = FontWeight.SemiBold,
         )
     }
 
-    Spacer(Modifier.height(16.dp))
+    Spacer(Modifier.height(14.dp))
     LinearProgressIndicator(
-        progress = { (questionIndex + 1f) / SESSION_SIZE },
+        progress = { (session.questionIndex + 1f) / session.hands.size },
         modifier = Modifier
             .fillMaxWidth()
-            .height(8.dp),
+            .height(7.dp)
+            .clip(RoundedCornerShape(100.dp)),
         color = MaterialTheme.colorScheme.primary,
         trackColor = SurfaceElevated,
     )
@@ -161,34 +169,43 @@ private fun ColumnScope.QuestionContent(
         verticalArrangement = Arrangement.Center,
     ) {
         Text(
-            text = "Tout le monde passe jusqu’au BTN",
-            color = TextSecondary,
+            text = "OPEN BTN",
+            color = MaterialTheme.colorScheme.primary,
+            fontSize = 12.sp,
+            fontWeight = FontWeight.Bold,
+            letterSpacing = 1.8.sp,
         )
-        Spacer(Modifier.height(8.dp))
+        Spacer(Modifier.height(12.dp))
         Text(
-            text = "Tu es au ${range.position} · ${range.stackDepthBb} BB",
+            text = "Tout le monde passe jusqu’au BTN",
+            color = MaterialTheme.colorScheme.onBackground,
             style = MaterialTheme.typography.titleLarge,
         )
+        Spacer(Modifier.height(6.dp))
         Text(
-            text = "Open à ${range.sizingBb} BB ou Fold ?",
+            text = "${range.stackDepthBb} BB effectifs",
             color = TextSecondary,
         )
 
-        Spacer(Modifier.height(52.dp))
-        Box(
-            modifier = Modifier
-                .background(SurfaceElevated, RoundedCornerShape(32.dp))
-                .padding(horizontal = 52.dp, vertical = 36.dp),
-            contentAlignment = Alignment.Center,
+        Spacer(Modifier.height(42.dp))
+        Surface(
+            color = SurfaceSoft,
+            shape = RoundedCornerShape(30.dp),
         ) {
-            Text(
-                text = hand.notation,
-                style = MaterialTheme.typography.displayLarge,
-            )
+            Box(
+                modifier = Modifier.padding(horizontal = 54.dp, vertical = 34.dp),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(
+                    text = hand.notation,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    style = MaterialTheme.typography.displayLarge,
+                )
+            }
         }
-        Spacer(Modifier.height(14.dp))
+        Spacer(Modifier.height(16.dp))
         Text(
-            text = "${elapsedSeconds}s · temps non pénalisé",
+            text = "${elapsedSeconds}s · sans pénalité",
             color = TextSecondary,
         )
     }
@@ -206,7 +223,7 @@ private fun ColumnScope.QuestionContent(
                 onClick = { onAnswer(PokerAction.FOLD) },
             )
             ActionButton(
-                label = "Open",
+                label = "Open 2,5 BB",
                 modifier = Modifier.weight(1f),
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary,
@@ -215,31 +232,40 @@ private fun ColumnScope.QuestionContent(
         }
     } else {
         Surface(
-            color = if (isCorrect) Success.copy(alpha = 0.18f) else Error.copy(alpha = 0.18f),
-            shape = RoundedCornerShape(24.dp),
+            color = if (isCorrect) Success.copy(alpha = 0.16f) else Error.copy(alpha = 0.16f),
+            shape = RoundedCornerShape(22.dp),
             modifier = Modifier.fillMaxWidth(),
         ) {
-            Column(Modifier.padding(20.dp)) {
+            Column(Modifier.padding(18.dp)) {
                 Text(
-                    text = if (isCorrect) "Correct" else "Incorrect",
+                    text = if (isCorrect) {
+                        "+${ProgressStore.XP_PER_CORRECT_ANSWER} XP · Correct"
+                    } else {
+                        "Incorrect"
+                    },
                     color = if (isCorrect) Success else Error,
                     style = MaterialTheme.typography.headlineMedium,
                 )
                 Text(
-                    text = "La bonne action est ${expectedAction.label}.",
+                    text = when (expectedAction) {
+                        PokerAction.OPEN -> "La bonne action est Open 2,5 BB."
+                        PokerAction.FOLD -> "La bonne action est Fold."
+                    },
                     color = MaterialTheme.colorScheme.onSurface,
                 )
-                Spacer(Modifier.height(16.dp))
+                Spacer(Modifier.height(14.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                     OutlinedButton(
                         onClick = onShowRange,
                         modifier = Modifier.weight(1f),
+                        shape = RoundedCornerShape(16.dp),
                     ) {
                         Text("Voir la range")
                     }
                     Button(
                         onClick = onNext,
                         modifier = Modifier.weight(1f),
+                        shape = RoundedCornerShape(16.dp),
                     ) {
                         Text("Continuer")
                     }
@@ -249,30 +275,18 @@ private fun ColumnScope.QuestionContent(
     }
 }
 
-private fun createBalancedSession(range: RangeDefinition): List<HandCategory> {
-    val byAction = range.entries.groupBy { it.action }
-    val perAction = SESSION_SIZE / 2
-
-    return buildList {
-        addAll(byAction.getValue(PokerAction.OPEN).shuffled().take(perAction))
-        addAll(byAction.getValue(PokerAction.FOLD).shuffled().take(perAction))
-    }
-        .shuffled()
-        .map { it.hand }
-}
-
 @Composable
 private fun ActionButton(
     label: String,
     modifier: Modifier,
-    containerColor: androidx.compose.ui.graphics.Color,
-    contentColor: androidx.compose.ui.graphics.Color,
+    containerColor: Color,
+    contentColor: Color,
     onClick: () -> Unit,
 ) {
     Button(
         onClick = onClick,
         modifier = modifier.height(64.dp),
-        shape = RoundedCornerShape(22.dp),
+        shape = RoundedCornerShape(20.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = containerColor,
             contentColor = contentColor,
@@ -293,31 +307,47 @@ private fun SessionSummary(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
-        Text("Session terminée", style = MaterialTheme.typography.headlineLarge)
-        Spacer(Modifier.height(12.dp))
         Text(
-            text = "$correctCount / $SESSION_SIZE",
+            text = "SESSION TERMINÉE",
+            color = MaterialTheme.colorScheme.primary,
+            fontSize = 12.sp,
+            fontWeight = FontWeight.Bold,
+            letterSpacing = 1.8.sp,
+        )
+        Spacer(Modifier.height(10.dp))
+        Text("Bien joué.", style = MaterialTheme.typography.headlineLarge)
+        Spacer(Modifier.height(16.dp))
+        Text(
+            text = "$correctCount / 20",
             color = MaterialTheme.colorScheme.primary,
             style = MaterialTheme.typography.displayLarge,
         )
         Text("bonnes réponses", color = TextSecondary)
+        Spacer(Modifier.height(8.dp))
+        Text(
+            text = "${correctCount * ProgressStore.XP_PER_CORRECT_ANSWER} XP gagnés",
+            color = Progress,
+            fontWeight = FontWeight.SemiBold,
+        )
         Spacer(Modifier.height(40.dp))
         Button(
-            onClick = onRestart,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(60.dp),
-        ) {
-            Text("Recommencer")
-        }
-        Spacer(Modifier.height(12.dp))
-        OutlinedButton(
             onClick = onBack,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(56.dp),
+                .height(60.dp),
+            shape = RoundedCornerShape(20.dp),
         ) {
             Text("Retour à l’accueil")
+        }
+        Spacer(Modifier.height(12.dp))
+        OutlinedButton(
+            onClick = onRestart,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(56.dp),
+            shape = RoundedCornerShape(20.dp),
+        ) {
+            Text("Nouvelle session")
         }
     }
 }

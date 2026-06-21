@@ -120,10 +120,24 @@ Le profil local contient :
 - série courante et meilleure série ;
 - date de dernière session quotidienne terminée.
 
-Le barème d'XP et la courbe de niveaux seront documentés avant codage de cette
-partie.
+Le premier barème attribue 10 XP par bonne réponse. La courbe de niveaux reste
+à définir.
 
-## 4. Validation des ranges
+## 4. Persistance du premier incrément
+
+Le premier incrément utilise DataStore pour conserver :
+
+- l'ordre des 20 mains de la session ;
+- l'index de la question courante ;
+- le score de la session ;
+- l'action déjà choisie sur la question courante ;
+- le total d'XP ;
+- la série et la date de dernière session terminée.
+
+Room sera introduit lorsque l'historique détaillé des réponses et la répétition
+espacée nécessiteront des requêtes structurées.
+
+## 5. Validation des ranges
 
 Pour chaque fichier de données :
 
