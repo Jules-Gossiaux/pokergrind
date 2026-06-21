@@ -15,7 +15,6 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.pokergrind.app.data.BtnOpenRange
-import com.pokergrind.app.data.CoOpenRange
 import com.pokergrind.app.domain.training.TrainingMode
 import com.pokergrind.app.ui.home.HomeScreen
 import com.pokergrind.app.ui.statistics.StatisticsScreen
@@ -51,14 +50,12 @@ fun PokerGrindApp(viewModel: PokerGrindViewModel = viewModel()) {
 
         when (destination) {
             Destination.HOME -> HomeScreen(
-                range = BtnOpenRange.definition,
+                ranges = viewModel.ranges,
                 xp = uiState.xp,
                 streak = uiState.streak,
                 activeSession = uiState.session?.takeUnless { it.isComplete },
-                btnMastery = uiState.btnMastery,
-                coMastery = uiState.coMastery,
-                coUnlocked = CoOpenRange.definition.id in uiState.unlockedSpotIds,
-                hjUnlocked = PokerGrindViewModel.HJ_SPOT_ID in uiState.unlockedSpotIds,
+                masteryBySpot = uiState.masteryBySpot,
+                unlockedSpotIds = uiState.unlockedSpotIds,
                 onStartTraining = {
                     viewModel.startGuidedSession()
                     destination = Destination.TRAINING
@@ -75,6 +72,7 @@ fun PokerGrindApp(viewModel: PokerGrindViewModel = viewModel()) {
             )
 
             Destination.FREE_SPOT -> FreeSpotScreen(
+                ranges = viewModel.ranges,
                 unlockedSpotIds = uiState.unlockedSpotIds,
                 freeAnswerCount = uiState.statistics.freeSpotStats.sumOf { it.answerCount },
                 onSelectSpot = { spotId ->
@@ -85,6 +83,7 @@ fun PokerGrindApp(viewModel: PokerGrindViewModel = viewModel()) {
             )
 
             Destination.STATISTICS -> StatisticsScreen(
+                ranges = viewModel.ranges,
                 statistics = uiState.statistics,
                 masteryBySpot = uiState.masteryBySpot,
                 unlockedSpotIds = uiState.unlockedSpotIds,

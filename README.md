@@ -50,6 +50,9 @@ La décision détaillée se trouve dans
 - [Direction visuelle](docs/design-system.md)
 - [Transcription Open BTN](docs/ranges/open-btn.md)
 - [Transcription Open CO](docs/ranges/open-co.md)
+- [Transcription Open HJ](docs/ranges/open-hj.md)
+- [Transcription Open UTG](docs/ranges/open-utg.md)
+- [Transcription Open SB](docs/ranges/open-sb.md)
 - [Statistiques](docs/statistics.md)
 - [Feuille de route](docs/roadmap.md)
 - [Décisions d'architecture](docs/decisions/README.md)
@@ -84,7 +87,7 @@ L'APK de debug est généré dans `app/build/outputs/apk/debug/`.
 
 ## État du projet
 
-Les ranges Open BTN et Open CO sont disponibles : parcours progressif,
+Les cinq ranges d'open 6-max sont disponibles : parcours progressif,
 sessions guidées multi-spots, entraînement libre ciblé, répétition espacée,
-XP, série, statistiques par spot et par main, feedback Open/Fold et matrices
-natives.
+XP, série, table 6-max native, statistiques par spot et matrice de maîtrise,
+feedback Open/Fold et matrices de ranges natives.

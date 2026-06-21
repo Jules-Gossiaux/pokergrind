@@ -1,7 +1,7 @@
 # Transcription — Open BTN 100 BB
 
 - Identifiant : `open_btn_100bb_v1`
-- Source locale : `ranges/image.png`
+- Source locale : `ranges/open_BTN.png`
 - Date de transcription : 2026-06-21
 - Sizing : 2,5 BB
 - Action principale : Open ou Fold

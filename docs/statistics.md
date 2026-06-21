@@ -11,7 +11,13 @@ certification.
 - progression actuelle sur les 30 dernières réponses ;
 - temps de réponse moyen ;
 - mains les plus faibles et les plus fortes ;
+- matrice 13 × 13 par spot, dont chaque case est remplie selon le taux de
+  réussite historique de la main ;
 - volume séparé d'entraînement libre.
+
+Une case grise indique qu'aucune réponse guidée n'existe encore. Une case
+partiellement verte représente directement le pourcentage de réussite : une
+main à 50 % remplit la moitié de sa case.
 
 Une main doit avoir au moins deux réponses guidées avant d'entrer dans les
 classements forts/faibles. Ce seuil volontairement bas sera relevé lorsque

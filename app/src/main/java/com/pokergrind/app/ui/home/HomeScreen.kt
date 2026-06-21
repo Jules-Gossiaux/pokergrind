@@ -42,18 +42,18 @@ import com.pokergrind.app.ui.theme.TextSecondary
 
 @Composable
 fun HomeScreen(
-    range: RangeDefinition,
+    ranges: List<RangeDefinition>,
     xp: Int,
     streak: Int,
     activeSession: StoredTrainingSession?,
-    btnMastery: SpotMastery,
-    coMastery: SpotMastery,
-    coUnlocked: Boolean,
-    hjUnlocked: Boolean,
+    masteryBySpot: Map<String, SpotMastery>,
+    unlockedSpotIds: Set<String>,
     onStartTraining: () -> Unit,
     onOpenFreeTraining: () -> Unit,
     onOpenStatistics: () -> Unit,
 ) {
+    val firstRange = ranges.first()
+    val firstMastery = masteryBySpot[firstRange.id] ?: MasteryCalculator.empty
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -118,7 +118,7 @@ fun HomeScreen(
                 style = MaterialTheme.typography.headlineMedium,
             )
             Text(
-                text = if (btnMastery.isMastered) {
+                text = if (firstMastery.isMastered) {
                     "Open BTN maîtrisé. Le prochain spot est débloqué."
                 } else {
                     "Le prochain spot se débloque à 90 % de réussite sur tes 30 dernières réponses."
@@ -128,37 +128,28 @@ fun HomeScreen(
 
             Spacer(Modifier.height(18.dp))
 
-            PathStep(
-                number = 1,
-                title = "Open BTN",
-                subtitle = activeSession?.let {
-                    val label = if (it.mode == TrainingMode.GUIDED) "Guidé" else "Libre"
-                    "$label en cours · ${(it.questionIndex + 1).coerceAtMost(it.questions.size)}/${it.questions.size}"
-                } ?: "${range.stackDepthBb} BB · Open 2,5 BB",
-                isActive = true,
-                unlockHint = masteryLabel(btnMastery),
-                connectorUnlocked = btnMastery.isMastered,
-            )
-            PathStep(
-                number = 2,
-                title = "Open CO",
-                subtitle = if (coUnlocked) {
-                    "100 BB · Open 2,5 BB"
-                } else {
-                    "À débloquer"
-                },
-                isUnlocked = coUnlocked,
-                unlockHint = if (coUnlocked) masteryLabel(coMastery) else null,
-                connectorUnlocked = coMastery.isMastered,
-            )
-            PathStep(
-                number = 3,
-                title = "Open HJ",
-                subtitle = if (hjUnlocked) "Débloqué · contenu à venir" else "À débloquer",
-                isUnlocked = hjUnlocked,
-            )
-            PathStep(number = 4, title = "Open UTG", subtitle = "À débloquer")
-            PathStep(number = 5, title = "Open SB", subtitle = "À débloquer", showConnector = false)
+            ranges.forEachIndexed { index, range ->
+                val unlocked = range.id in unlockedSpotIds
+                val mastery = masteryBySpot[range.id] ?: MasteryCalculator.empty
+                val sessionTouchesRange = activeSession?.currentQuestion?.spotId == range.id
+                PathStep(
+                    number = index + 1,
+                    title = range.title,
+                    subtitle = if (sessionTouchesRange) {
+                        val label = if (activeSession?.mode == TrainingMode.GUIDED) "Guidé" else "Libre"
+                        "$label en cours · ${(activeSession?.questionIndex?.plus(1) ?: 1)}/20"
+                    } else if (unlocked) {
+                        "${range.stackDepthBb} BB · Open 2,5 BB"
+                    } else {
+                        "À débloquer"
+                    },
+                    isActive = index == 0,
+                    isUnlocked = unlocked,
+                    unlockHint = if (unlocked) masteryLabel(mastery) else null,
+                    connectorUnlocked = ranges.getOrNull(index + 1)?.id in unlockedSpotIds,
+                    showConnector = index < ranges.lastIndex,
+                )
+            }
 
             Spacer(Modifier.height(16.dp))
         }
@@ -168,7 +159,7 @@ fun HomeScreen(
                 onClick = onStartTraining,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(62.dp),
+                    .height(56.dp),
                 enabled = activeSession?.mode != TrainingMode.FREE,
                 shape = RoundedCornerShape(20.dp),
                 colors = ButtonDefaults.buttonColors(
@@ -184,31 +175,26 @@ fun HomeScreen(
                     },
                 )
             }
-            Spacer(Modifier.height(10.dp))
-            OutlinedButton(
-                onClick = onOpenFreeTraining,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp),
-                shape = RoundedCornerShape(18.dp),
-            ) {
-                Text(
-                    if (activeSession?.mode == TrainingMode.FREE) {
-                        "Reprendre le libre · ${activeSession.questionIndex + 1}/20"
-                    } else {
-                        "Entraînement libre"
-                    },
-                )
-            }
-            Spacer(Modifier.height(10.dp))
-            OutlinedButton(
-                onClick = onOpenStatistics,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(52.dp),
-                shape = RoundedCornerShape(18.dp),
-            ) {
-                Text("Statistiques")
+            Spacer(Modifier.height(8.dp))
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                OutlinedButton(
+                    onClick = onOpenFreeTraining,
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(48.dp),
+                    shape = RoundedCornerShape(16.dp),
+                ) {
+                    Text(if (activeSession?.mode == TrainingMode.FREE) "Reprendre libre" else "Mode libre")
+                }
+                OutlinedButton(
+                    onClick = onOpenStatistics,
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(48.dp),
+                    shape = RoundedCornerShape(16.dp),
+                ) {
+                    Text("Statistiques")
+                }
             }
         }
     }

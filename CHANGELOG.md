@@ -53,3 +53,9 @@ encore de version publiée.
 - premier écran Statistiques par spot et par main ;
 - classement des points forts et mains à travailler avec seuil de fiabilité ;
 - déblocage permanent de HJ après maîtrise de CO.
+- transcription et validation des ranges Open HJ, UTG et SB ;
+- parcours complet des cinq positions d'open, avec déblocages successifs ;
+- représentation native d'une table 6-max pendant les questions ;
+- matrice statistique 13 × 13 remplie selon la réussite de chaque main ;
+- sélection de la position dans les statistiques et le mode libre ;
+- actions d'accueil compactées pour préserver l'espace du parcours.

@@ -5,7 +5,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.pokergrind.app.data.AnswerRepository
 import com.pokergrind.app.data.BtnOpenRange
-import com.pokergrind.app.data.CoOpenRange
+import com.pokergrind.app.data.OpenRanges
 import com.pokergrind.app.data.StatisticsRepository
 import com.pokergrind.app.data.local.PokerGrindDatabase
 import com.pokergrind.app.data.local.ProgressStore
@@ -23,6 +23,7 @@ import com.pokergrind.app.domain.training.TrainingMode
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -37,9 +38,6 @@ data class PokerGrindUiState(
 ) {
     val btnMastery: SpotMastery
         get() = masteryBySpot[BtnOpenRange.definition.id] ?: MasteryCalculator.empty
-
-    val coMastery: SpotMastery
-        get() = masteryBySpot[CoOpenRange.definition.id] ?: MasteryCalculator.empty
 }
 
 class PokerGrindViewModel(application: Application) : AndroidViewModel(application) {
@@ -52,22 +50,18 @@ class PokerGrindViewModel(application: Application) : AndroidViewModel(applicati
         progressStore = progressStore,
     )
     private val statisticsRepository = StatisticsRepository(database.answerDao())
-    private val ranges: List<RangeDefinition> = listOf(
-        BtnOpenRange.definition,
-        CoOpenRange.definition,
-    )
+    val ranges: List<RangeDefinition> = OpenRanges.all
     private val rangesById = ranges.associateBy(RangeDefinition::id)
     private val btnRange = BtnOpenRange.definition
-    private val coRange = CoOpenRange.definition
 
     private val masteryFlow = combine(
-        answerRepository.observeRecentAnswers(btnRange.id, MasteryCalculator.WINDOW_SIZE),
-        answerRepository.observeRecentAnswers(coRange.id, MasteryCalculator.WINDOW_SIZE),
-    ) { btnAnswers, coAnswers ->
-        mapOf(
-            btnRange.id to MasteryCalculator.calculate(btnAnswers),
-            coRange.id to MasteryCalculator.calculate(coAnswers),
-        )
+        ranges.map { range ->
+            answerRepository
+                .observeRecentAnswers(range.id, MasteryCalculator.WINDOW_SIZE)
+                .map { answers -> range.id to MasteryCalculator.calculate(answers) }
+        },
+    ) { masteryPairs ->
+        masteryPairs.toMap()
     }
 
     val uiState: StateFlow<PokerGrindUiState> = combine(
@@ -76,11 +70,10 @@ class PokerGrindViewModel(application: Application) : AndroidViewModel(applicati
         answerRepository.observeUnlockedSpotIds(),
         statisticsRepository.statistics,
     ) { progress, masteryBySpot, unlockedSpotIds, statistics ->
-        if (masteryBySpot.getValue(btnRange.id).isMastered && coRange.id !in unlockedSpotIds) {
-            viewModelScope.launch { answerRepository.ensureUnlocked(coRange.id) }
-        }
-        if (masteryBySpot.getValue(coRange.id).isMastered && HJ_SPOT_ID !in unlockedSpotIds) {
-            viewModelScope.launch { answerRepository.ensureUnlocked(HJ_SPOT_ID) }
+        ranges.zipWithNext().forEach { (current, next) ->
+            if (masteryBySpot.getValue(current.id).isMastered && next.id !in unlockedSpotIds) {
+                viewModelScope.launch { answerRepository.ensureUnlocked(next.id) }
+            }
         }
         progress.toUiState(
             masteryBySpot = masteryBySpot,
@@ -177,8 +170,4 @@ class PokerGrindViewModel(application: Application) : AndroidViewModel(applicati
         unlockedSpotIds = unlockedSpotIds,
         statistics = statistics,
     )
-
-    companion object {
-        const val HJ_SPOT_ID = "open_hj_100bb_v1"
-    }
 }

@@ -17,13 +17,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.pokergrind.app.data.BtnOpenRange
-import com.pokergrind.app.data.CoOpenRange
+import com.pokergrind.app.domain.model.RangeDefinition
 import com.pokergrind.app.ui.theme.SurfaceElevated
 import com.pokergrind.app.ui.theme.TextSecondary
 
 @Composable
 fun FreeSpotScreen(
+    ranges: List<RangeDefinition>,
     unlockedSpotIds: Set<String>,
     freeAnswerCount: Int,
     onSelectSpot: (String) -> Unit,
@@ -47,23 +47,16 @@ fun FreeSpotScreen(
             Text("$freeAnswerCount réponses libres au total", color = TextSecondary)
             Spacer(Modifier.height(28.dp))
 
-            SpotCard(
-                title = "Open BTN",
-                subtitle = "100 BB · Open 2,5 BB",
-                enabled = true,
-                onClick = { onSelectSpot(BtnOpenRange.definition.id) },
-            )
-            Spacer(Modifier.height(12.dp))
-            SpotCard(
-                title = "Open CO",
-                subtitle = if (CoOpenRange.definition.id in unlockedSpotIds) {
-                    "100 BB · Open 2,5 BB"
-                } else {
-                    "Verrouillé"
-                },
-                enabled = CoOpenRange.definition.id in unlockedSpotIds,
-                onClick = { onSelectSpot(CoOpenRange.definition.id) },
-            )
+            ranges.forEach { range ->
+                val enabled = range.id in unlockedSpotIds
+                SpotCard(
+                    title = range.title,
+                    subtitle = if (enabled) "100 BB · Open 2,5 BB" else "Verrouillé",
+                    enabled = enabled,
+                    onClick = { onSelectSpot(range.id) },
+                )
+                Spacer(Modifier.height(10.dp))
+            }
         }
 
         OutlinedButton(

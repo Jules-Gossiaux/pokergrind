@@ -178,19 +178,14 @@ private fun ColumnScope.QuestionContent(
             fontWeight = FontWeight.Bold,
             letterSpacing = 1.8.sp,
         )
-        Spacer(Modifier.height(12.dp))
+        Spacer(Modifier.height(4.dp))
+        PokerTable(activePosition = range.position)
         Text(
-            text = "Tout le monde passe jusqu’au ${range.position}",
-            color = MaterialTheme.colorScheme.onBackground,
-            style = MaterialTheme.typography.titleLarge,
-        )
-        Spacer(Modifier.height(6.dp))
-        Text(
-            text = "${range.stackDepthBb} BB effectifs",
+            text = "À toi de parler · ${range.position} · ${range.stackDepthBb} BB",
             color = TextSecondary,
         )
 
-        Spacer(Modifier.height(42.dp))
+        Spacer(Modifier.height(20.dp))
         Surface(
             color = SurfaceSoft,
             shape = RoundedCornerShape(30.dp),
