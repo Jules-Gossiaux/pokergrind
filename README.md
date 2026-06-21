@@ -48,6 +48,7 @@ La décision détaillée se trouve dans
 - [Modèle de données](docs/data-model.md)
 - [Répétition espacée](docs/spaced-repetition.md)
 - [Direction visuelle](docs/design-system.md)
+- [Transcription Open BTN](docs/ranges/open-btn.md)
 - [Feuille de route](docs/roadmap.md)
 - [Décisions d'architecture](docs/decisions/README.md)
 - [Historique des changements](CHANGELOG.md)
@@ -61,7 +62,26 @@ affichées ou embarquées telles quelles dans l'APK.
 Chaque range sera retranscrite en données structurées, contrôlée manuellement
 et couverte par des tests avant son utilisation dans l'application.
 
+## Développement local
+
+Prérequis :
+
+- JDK 17 ;
+- Android SDK 36 ;
+- Android Studio pour gérer le SDK et l'émulateur, même si le code est édité
+  dans VS Code.
+
+Commandes principales sous PowerShell :
+
+```powershell
+./gradlew test
+./gradlew assembleDebug
+```
+
+L'APK de debug est généré dans `app/build/outputs/apk/debug/`.
+
 ## État du projet
 
-Le cadrage produit et l'architecture initiale sont documentés. Le squelette
-Android sera créé lors de l'étape suivante.
+La première tranche verticale Open BTN est disponible : accueil, session locale
+équilibrée de 20 questions, chronomètre informatif, feedback Open/Fold et
+matrice native de la range.

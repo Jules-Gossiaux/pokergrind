@@ -4,20 +4,21 @@ Cette feuille de route décrit l'ordre de travail, pas des dates de livraison.
 
 ## Étape 0 — Socle
 
-- documentation initiale ;
-- projet Android et automatisation de build ;
-- thème sombre et composants fondamentaux ;
+- documentation initiale — réalisé ;
+- projet Android et build Gradle — réalisé ;
+- thème sombre et composants fondamentaux — réalisé ;
 - stockage local et navigation ;
-- format structuré et validation des ranges.
+- format structuré et validation des ranges — réalisé pour Open BTN.
 
 ## Étape 1 — Open BTN vertical
 
-- transcription et validation de la range BTN ;
-- session d'entraînement Open / Fold ;
-- feedback immédiat ;
-- matrice `Voir la range` ;
+- transcription et validation de la range BTN — réalisé ;
+- session d'entraînement Open / Fold — réalisé sans persistance ;
+- feedback immédiat — réalisé ;
+- matrice `Voir la range` — réalisé ;
 - historique local minimal ;
-- tests du parcours complet.
+- tests du domaine — réalisés ;
+- test du parcours sur émulateur ou appareil — à réaliser.
 
 Cette tranche doit fonctionner de bout en bout avant l'ajout d'un deuxième
 spot.

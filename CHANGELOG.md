@@ -16,3 +16,9 @@ encore de version publiée.
 - stratégie initiale de répétition espacée ;
 - direction visuelle et feuille de route ;
 - politique de conservation des images de ranges.
+- squelette Android Kotlin et Jetpack Compose ;
+- thème sombre PokerGrind ;
+- transcription structurée de la range Open BTN à 45,40 % ;
+- session locale de 20 questions Open/Fold ;
+- feedback immédiat et matrice de range native ;
+- tests unitaires des 169 mains et des 602 combinaisons ouvertes.
