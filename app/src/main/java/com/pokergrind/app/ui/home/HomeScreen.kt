@@ -47,8 +47,12 @@ fun HomeScreen(
     streak: Int,
     activeSession: StoredTrainingSession?,
     btnMastery: SpotMastery,
+    coMastery: SpotMastery,
+    coUnlocked: Boolean,
+    hjUnlocked: Boolean,
     onStartTraining: () -> Unit,
     onOpenFreeTraining: () -> Unit,
+    onOpenStatistics: () -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -138,14 +142,21 @@ fun HomeScreen(
             PathStep(
                 number = 2,
                 title = "Open CO",
-                subtitle = if (btnMastery.isMastered) {
-                    "Débloqué · range à intégrer"
+                subtitle = if (coUnlocked) {
+                    "100 BB · Open 2,5 BB"
                 } else {
                     "À débloquer"
                 },
-                isUnlocked = btnMastery.isMastered,
+                isUnlocked = coUnlocked,
+                unlockHint = if (coUnlocked) masteryLabel(coMastery) else null,
+                connectorUnlocked = coMastery.isMastered,
             )
-            PathStep(number = 3, title = "Open HJ", subtitle = "À débloquer")
+            PathStep(
+                number = 3,
+                title = "Open HJ",
+                subtitle = if (hjUnlocked) "Débloqué · contenu à venir" else "À débloquer",
+                isUnlocked = hjUnlocked,
+            )
             PathStep(number = 4, title = "Open UTG", subtitle = "À débloquer")
             PathStep(number = 5, title = "Open SB", subtitle = "À débloquer", showConnector = false)
 
@@ -188,6 +199,16 @@ fun HomeScreen(
                         "Entraînement libre"
                     },
                 )
+            }
+            Spacer(Modifier.height(10.dp))
+            OutlinedButton(
+                onClick = onOpenStatistics,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(52.dp),
+                shape = RoundedCornerShape(18.dp),
+            ) {
+                Text("Statistiques")
             }
         }
     }

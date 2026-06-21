@@ -15,14 +15,17 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.pokergrind.app.data.BtnOpenRange
+import com.pokergrind.app.data.CoOpenRange
 import com.pokergrind.app.domain.training.TrainingMode
 import com.pokergrind.app.ui.home.HomeScreen
+import com.pokergrind.app.ui.statistics.StatisticsScreen
 import com.pokergrind.app.ui.training.FreeSpotScreen
 import com.pokergrind.app.ui.training.TrainingScreen
 
 private enum class Destination {
     HOME,
     FREE_SPOT,
+    STATISTICS,
     TRAINING,
 }
 
@@ -53,6 +56,9 @@ fun PokerGrindApp(viewModel: PokerGrindViewModel = viewModel()) {
                 streak = uiState.streak,
                 activeSession = uiState.session?.takeUnless { it.isComplete },
                 btnMastery = uiState.btnMastery,
+                coMastery = uiState.coMastery,
+                coUnlocked = CoOpenRange.definition.id in uiState.unlockedSpotIds,
+                hjUnlocked = PokerGrindViewModel.HJ_SPOT_ID in uiState.unlockedSpotIds,
                 onStartTraining = {
                     viewModel.startGuidedSession()
                     destination = Destination.TRAINING
@@ -65,15 +71,23 @@ fun PokerGrindApp(viewModel: PokerGrindViewModel = viewModel()) {
                         Destination.FREE_SPOT
                     }
                 },
+                onOpenStatistics = { destination = Destination.STATISTICS },
             )
 
             Destination.FREE_SPOT -> FreeSpotScreen(
                 unlockedSpotIds = uiState.unlockedSpotIds,
-                freeAnswerCount = uiState.freeAnswerCount,
+                freeAnswerCount = uiState.statistics.freeSpotStats.sumOf { it.answerCount },
                 onSelectSpot = { spotId ->
                     viewModel.startFreeSession(spotId)
                     destination = Destination.TRAINING
                 },
+                onBack = { destination = Destination.HOME },
+            )
+
+            Destination.STATISTICS -> StatisticsScreen(
+                statistics = uiState.statistics,
+                masteryBySpot = uiState.masteryBySpot,
+                unlockedSpotIds = uiState.unlockedSpotIds,
                 onBack = { destination = Destination.HOME },
             )
 
@@ -84,7 +98,11 @@ fun PokerGrindApp(viewModel: PokerGrindViewModel = viewModel()) {
                 onNext = viewModel::moveToNextQuestion,
                 onRestart = {
                     when (uiState.session?.mode) {
-                        TrainingMode.FREE -> viewModel.startFreeSession(BtnOpenRange.definition.id)
+                        TrainingMode.FREE -> {
+                            val spotId = uiState.session?.questions?.firstOrNull()?.spotId
+                                ?: BtnOpenRange.definition.id
+                            viewModel.startFreeSession(spotId)
+                        }
                         else -> viewModel.startGuidedSession()
                     }
                 },

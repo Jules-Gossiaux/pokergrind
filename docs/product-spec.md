@@ -37,6 +37,11 @@ Le premier incrément couvre uniquement les open ranges, dans cet ordre :
 
 Un spot verrouillé devient disponible lorsque le spot précédent est maîtrisé.
 
+Open BTN et Open CO sont actuellement intégrés. Les sessions guidées
+garantissent qu'au moins quatre questions proviennent de chaque range
+débloquée et disponible, avant de consacrer le reste du budget aux révisions
+les plus prioritaires.
+
 ## 4. Parcours préflop ultérieur
 
 Après les open ranges :

@@ -49,6 +49,8 @@ La décision détaillée se trouve dans
 - [Répétition espacée](docs/spaced-repetition.md)
 - [Direction visuelle](docs/design-system.md)
 - [Transcription Open BTN](docs/ranges/open-btn.md)
+- [Transcription Open CO](docs/ranges/open-co.md)
+- [Statistiques](docs/statistics.md)
 - [Feuille de route](docs/roadmap.md)
 - [Décisions d'architecture](docs/decisions/README.md)
 - [Historique des changements](CHANGELOG.md)
@@ -82,9 +84,7 @@ L'APK de debug est généré dans `app/build/outputs/apk/debug/`.
 
 ## État du projet
 
-La première tranche verticale Open BTN est disponible : accueil, chemin de
-progression Fondations, session persistante et équilibrée de 20 questions,
-XP, série quotidienne, historique Room, maîtrise sur les 30 dernières
-réponses guidées, répétition espacée, entraînement libre ciblé, déblocage
-d'Open CO, chronomètre informatif, feedback Open/Fold et matrice native de la
-range.
+Les ranges Open BTN et Open CO sont disponibles : parcours progressif,
+sessions guidées multi-spots, entraînement libre ciblé, répétition espacée,
+XP, série, statistiques par spot et par main, feedback Open/Fold et matrices
+natives.

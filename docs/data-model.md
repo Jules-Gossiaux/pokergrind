@@ -155,6 +155,10 @@ Room contient aussi :
 - `review_items`, un état de répétition par couple spot-main ;
 - `spot_unlocks`, la liste permanente des spots déjà débloqués.
 
+Les statistiques sont calculées par des requêtes d'agrégation Room sur
+l'historique. Elles ne sont pas stockées comme des compteurs séparés, ce qui
+évite qu'elles divergent des réponses réelles.
+
 DataStore reste responsable du petit état transactionnel de l'interface :
 session en cours, XP et série.
 

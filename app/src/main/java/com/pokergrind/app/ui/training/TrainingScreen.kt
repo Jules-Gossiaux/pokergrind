@@ -180,7 +180,7 @@ private fun ColumnScope.QuestionContent(
         )
         Spacer(Modifier.height(12.dp))
         Text(
-            text = "Tout le monde passe jusqu’au BTN",
+            text = "Tout le monde passe jusqu’au ${range.position}",
             color = MaterialTheme.colorScheme.onBackground,
             style = MaterialTheme.typography.titleLarge,
         )

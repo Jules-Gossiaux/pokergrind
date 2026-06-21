@@ -18,7 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.pokergrind.app.data.BtnOpenRange
-import com.pokergrind.app.ui.PokerGrindViewModel
+import com.pokergrind.app.data.CoOpenRange
 import com.pokergrind.app.ui.theme.SurfaceElevated
 import com.pokergrind.app.ui.theme.TextSecondary
 
@@ -56,13 +56,13 @@ fun FreeSpotScreen(
             Spacer(Modifier.height(12.dp))
             SpotCard(
                 title = "Open CO",
-                subtitle = if (PokerGrindViewModel.CO_SPOT_ID in unlockedSpotIds) {
-                    "Débloqué · contenu à venir"
+                subtitle = if (CoOpenRange.definition.id in unlockedSpotIds) {
+                    "100 BB · Open 2,5 BB"
                 } else {
                     "Verrouillé"
                 },
-                enabled = false,
-                onClick = {},
+                enabled = CoOpenRange.definition.id in unlockedSpotIds,
+                onClick = { onSelectSpot(CoOpenRange.definition.id) },
             )
         }
 

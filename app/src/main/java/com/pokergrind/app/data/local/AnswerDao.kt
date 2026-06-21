@@ -24,4 +24,48 @@ interface AnswerDao {
 
     @Query("SELECT COUNT(*) FROM answers WHERE mode = 'FREE'")
     fun observeFreeAnswerCount(): Flow<Int>
+
+    @Query(
+        """
+        SELECT
+            spotId,
+            COUNT(*) AS answerCount,
+            SUM(CASE WHEN isCorrect = 1 THEN 1 ELSE 0 END) AS correctCount,
+            CAST(AVG(responseTimeMillis) AS INTEGER) AS averageResponseTimeMillis
+        FROM answers
+        WHERE mode = :mode
+        GROUP BY spotId
+        """,
+    )
+    fun observeSpotStats(mode: String): Flow<List<SpotStatsRow>>
+
+    @Query(
+        """
+        SELECT
+            spotId,
+            handNotation,
+            COUNT(*) AS answerCount,
+            SUM(CASE WHEN isCorrect = 1 THEN 1 ELSE 0 END) AS correctCount,
+            CAST(AVG(responseTimeMillis) AS INTEGER) AS averageResponseTimeMillis
+        FROM answers
+        WHERE mode = :mode
+        GROUP BY spotId, handNotation
+        """,
+    )
+    fun observeHandStats(mode: String): Flow<List<HandStatsRow>>
 }
+
+data class SpotStatsRow(
+    val spotId: String,
+    val answerCount: Int,
+    val correctCount: Int,
+    val averageResponseTimeMillis: Long,
+)
+
+data class HandStatsRow(
+    val spotId: String,
+    val handNotation: String,
+    val answerCount: Int,
+    val correctCount: Int,
+    val averageResponseTimeMillis: Long,
+)

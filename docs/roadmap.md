@@ -8,7 +8,7 @@ Cette feuille de route décrit l'ordre de travail, pas des dates de livraison.
 - projet Android et build Gradle — réalisé ;
 - thème sombre et composants fondamentaux — réalisé ;
 - stockage DataStore de la progression et navigation — réalisé ;
-- format structuré et validation des ranges — réalisé pour Open BTN.
+- format structuré et validation des ranges — réalisé pour Open BTN et CO.
 
 ## Étape 1 — Open BTN vertical
 
@@ -27,12 +27,13 @@ spot.
 
 ## Étape 2 — Parcours des open ranges
 
-- intégration de la range CO ;
+- intégration de la range CO — réalisé ;
 - puis HJ, UTG et SB ;
 - déblocage pédagogique — réalisé pour BTN vers CO ;
 - maîtrise sur les 30 dernières réponses — réalisé ;
 - couverture et diversité — réalisé pour Open/Fold ;
 - progression par spot.
+- statistiques comparatives BTN/CO — première version réalisée.
 
 ## Étape 3 — Boucle quotidienne
 

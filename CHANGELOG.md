@@ -46,3 +46,10 @@ encore de version publiée.
 - planificateur guidé compatible avec plusieurs ranges débloquées ;
 - déblocages de spots conservés définitivement ;
 - migration Room 1 vers 2 sans perte de progression.
+- transcription et validation de la range Open CO à 22,78 % ;
+- maîtrise indépendante pour BTN et CO ;
+- sessions guidées garanties multi-spots avec un minimum par range débloquée ;
+- sélection BTN ou CO dans l'entraînement libre ;
+- premier écran Statistiques par spot et par main ;
+- classement des points forts et mains à travailler avec seuil de fiabilité ;
+- déblocage permanent de HJ après maîtrise de CO.

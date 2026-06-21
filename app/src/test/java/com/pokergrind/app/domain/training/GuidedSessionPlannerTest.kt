@@ -1,6 +1,7 @@
 package com.pokergrind.app.domain.training
 
 import com.pokergrind.app.data.BtnOpenRange
+import com.pokergrind.app.data.CoOpenRange
 import kotlin.random.Random
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -27,5 +28,23 @@ class GuidedSessionPlannerTest {
 
         assertEquals(20, session.size)
         assertTrue(session.any { (_, hand) -> hand.notation == weakHand })
+    }
+
+    @Test
+    fun `every unlocked range is represented in a guided session`() {
+        val btn = BtnOpenRange.definition
+        val co = CoOpenRange.definition
+
+        val session = GuidedSessionPlanner.plan(
+            ranges = listOf(btn, co),
+            reviewStates = emptyMap(),
+            nowEpochMillis = 10_000,
+            random = Random(7),
+        )
+        val counts = session.groupingBy { it.first }.eachCount()
+
+        assertEquals(20, session.size)
+        assertTrue(counts.getValue(btn.id) >= 4)
+        assertTrue(counts.getValue(co.id) >= 4)
     }
 }

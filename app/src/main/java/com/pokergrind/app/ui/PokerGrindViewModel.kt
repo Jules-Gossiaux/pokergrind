@@ -5,6 +5,8 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.pokergrind.app.data.AnswerRepository
 import com.pokergrind.app.data.BtnOpenRange
+import com.pokergrind.app.data.CoOpenRange
+import com.pokergrind.app.data.StatisticsRepository
 import com.pokergrind.app.data.local.PokerGrindDatabase
 import com.pokergrind.app.data.local.ProgressStore
 import com.pokergrind.app.data.local.StoredProgress
@@ -12,6 +14,7 @@ import com.pokergrind.app.data.local.StoredQuestion
 import com.pokergrind.app.data.local.StoredTrainingSession
 import com.pokergrind.app.domain.model.PokerAction
 import com.pokergrind.app.domain.model.RangeDefinition
+import com.pokergrind.app.domain.statistics.StatisticsSnapshot
 import com.pokergrind.app.domain.training.GuidedSessionPlanner
 import com.pokergrind.app.domain.training.MasteryCalculator
 import com.pokergrind.app.domain.training.SessionFactory
@@ -27,11 +30,17 @@ data class PokerGrindUiState(
     val isLoading: Boolean = true,
     val xp: Int = 0,
     val streak: Int = 0,
-    val freeAnswerCount: Int = 0,
     val session: StoredTrainingSession? = null,
-    val btnMastery: SpotMastery = MasteryCalculator.empty,
+    val masteryBySpot: Map<String, SpotMastery> = emptyMap(),
     val unlockedSpotIds: Set<String> = emptySet(),
-)
+    val statistics: StatisticsSnapshot = StatisticsSnapshot(),
+) {
+    val btnMastery: SpotMastery
+        get() = masteryBySpot[BtnOpenRange.definition.id] ?: MasteryCalculator.empty
+
+    val coMastery: SpotMastery
+        get() = masteryBySpot[CoOpenRange.definition.id] ?: MasteryCalculator.empty
+}
 
 class PokerGrindViewModel(application: Application) : AndroidViewModel(application) {
     private val progressStore = ProgressStore(application)
@@ -42,28 +51,41 @@ class PokerGrindViewModel(application: Application) : AndroidViewModel(applicati
         spotUnlockDao = database.spotUnlockDao(),
         progressStore = progressStore,
     )
-    private val rangesById: Map<String, RangeDefinition> = listOf(BtnOpenRange.definition)
-        .associateBy(RangeDefinition::id)
-    private val btnRange = BtnOpenRange.definition
-    private val recentBtnAnswers = answerRepository.observeRecentAnswers(
-        btnRange.id,
-        MasteryCalculator.WINDOW_SIZE,
+    private val statisticsRepository = StatisticsRepository(database.answerDao())
+    private val ranges: List<RangeDefinition> = listOf(
+        BtnOpenRange.definition,
+        CoOpenRange.definition,
     )
+    private val rangesById = ranges.associateBy(RangeDefinition::id)
+    private val btnRange = BtnOpenRange.definition
+    private val coRange = CoOpenRange.definition
+
+    private val masteryFlow = combine(
+        answerRepository.observeRecentAnswers(btnRange.id, MasteryCalculator.WINDOW_SIZE),
+        answerRepository.observeRecentAnswers(coRange.id, MasteryCalculator.WINDOW_SIZE),
+    ) { btnAnswers, coAnswers ->
+        mapOf(
+            btnRange.id to MasteryCalculator.calculate(btnAnswers),
+            coRange.id to MasteryCalculator.calculate(coAnswers),
+        )
+    }
 
     val uiState: StateFlow<PokerGrindUiState> = combine(
         progressStore.progress,
-        recentBtnAnswers,
+        masteryFlow,
         answerRepository.observeUnlockedSpotIds(),
-        answerRepository.observeFreeAnswerCount(),
-    ) { progress, recentAnswers, unlockedSpotIds, freeAnswerCount ->
-        val mastery = MasteryCalculator.calculate(recentAnswers)
-        if (mastery.isMastered && CO_SPOT_ID !in unlockedSpotIds) {
-            viewModelScope.launch { answerRepository.ensureUnlocked(CO_SPOT_ID) }
+        statisticsRepository.statistics,
+    ) { progress, masteryBySpot, unlockedSpotIds, statistics ->
+        if (masteryBySpot.getValue(btnRange.id).isMastered && coRange.id !in unlockedSpotIds) {
+            viewModelScope.launch { answerRepository.ensureUnlocked(coRange.id) }
+        }
+        if (masteryBySpot.getValue(coRange.id).isMastered && HJ_SPOT_ID !in unlockedSpotIds) {
+            viewModelScope.launch { answerRepository.ensureUnlocked(HJ_SPOT_ID) }
         }
         progress.toUiState(
-            mastery = mastery,
+            masteryBySpot = masteryBySpot,
             unlockedSpotIds = unlockedSpotIds,
-            freeAnswerCount = freeAnswerCount,
+            statistics = statistics,
         )
     }
         .stateIn(
@@ -73,16 +95,13 @@ class PokerGrindViewModel(application: Application) : AndroidViewModel(applicati
         )
 
     init {
-        viewModelScope.launch {
-            answerRepository.ensureUnlocked(btnRange.id)
-        }
+        viewModelScope.launch { answerRepository.ensureUnlocked(btnRange.id) }
     }
 
     fun startGuidedSession() {
         if (hasActiveSession()) return
         viewModelScope.launch {
-            val availableRanges = uiState.value.unlockedSpotIds
-                .mapNotNull(rangesById::get)
+            val availableRanges = ranges.filter { it.id in uiState.value.unlockedSpotIds }
                 .ifEmpty { listOf(btnRange) }
             val reviewStates = answerRepository.reviewStates(availableRanges.map(RangeDefinition::id))
             val questions = GuidedSessionPlanner.plan(
@@ -99,11 +118,14 @@ class PokerGrindViewModel(application: Application) : AndroidViewModel(applicati
     fun startFreeSession(spotId: String) {
         if (hasActiveSession()) return
         val range = rangesById[spotId] ?: return
+        if (spotId !in uiState.value.unlockedSpotIds) return
         viewModelScope.launch {
-            val questions = SessionFactory.createBalancedSession(range).map { hand ->
-                StoredQuestion(spotId = range.id, handNotation = hand.notation)
-            }
-            progressStore.startSession(TrainingMode.FREE, questions)
+            progressStore.startSession(
+                mode = TrainingMode.FREE,
+                questions = SessionFactory.createBalancedSession(range).map { hand ->
+                    StoredQuestion(spotId = range.id, handNotation = hand.notation)
+                },
+            )
         }
     }
 
@@ -143,20 +165,20 @@ class PokerGrindViewModel(application: Application) : AndroidViewModel(applicati
         uiState.value.session?.let { !it.isComplete } == true
 
     private fun StoredProgress.toUiState(
-        mastery: SpotMastery,
+        masteryBySpot: Map<String, SpotMastery>,
         unlockedSpotIds: Set<String>,
-        freeAnswerCount: Int,
+        statistics: StatisticsSnapshot,
     ) = PokerGrindUiState(
         isLoading = false,
         xp = xp,
         streak = streak,
-        freeAnswerCount = freeAnswerCount,
         session = session,
-        btnMastery = mastery,
+        masteryBySpot = masteryBySpot,
         unlockedSpotIds = unlockedSpotIds,
+        statistics = statistics,
     )
 
     companion object {
-        const val CO_SPOT_ID = "open_co_100bb_v1"
+        const val HJ_SPOT_ID = "open_hj_100bb_v1"
     }
 }
