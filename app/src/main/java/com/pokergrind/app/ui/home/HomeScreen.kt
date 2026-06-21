@@ -20,6 +20,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -33,6 +34,7 @@ import com.pokergrind.app.data.local.StoredTrainingSession
 import com.pokergrind.app.domain.model.RangeDefinition
 import com.pokergrind.app.domain.training.MasteryCalculator
 import com.pokergrind.app.domain.training.SpotMastery
+import com.pokergrind.app.domain.training.TrainingMode
 import com.pokergrind.app.ui.theme.Progress
 import com.pokergrind.app.ui.theme.SurfaceElevated
 import com.pokergrind.app.ui.theme.SurfaceSoft
@@ -46,6 +48,7 @@ fun HomeScreen(
     activeSession: StoredTrainingSession?,
     btnMastery: SpotMastery,
     onStartTraining: () -> Unit,
+    onOpenFreeTraining: () -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -125,7 +128,8 @@ fun HomeScreen(
                 number = 1,
                 title = "Open BTN",
                 subtitle = activeSession?.let {
-                    "Session en cours · ${(it.questionIndex + 1).coerceAtMost(it.hands.size)}/${it.hands.size}"
+                    val label = if (it.mode == TrainingMode.GUIDED) "Guidé" else "Libre"
+                    "$label en cours · ${(it.questionIndex + 1).coerceAtMost(it.questions.size)}/${it.questions.size}"
                 } ?: "${range.stackDepthBb} BB · Open 2,5 BB",
                 isActive = true,
                 unlockHint = masteryLabel(btnMastery),
@@ -148,24 +152,43 @@ fun HomeScreen(
             Spacer(Modifier.height(16.dp))
         }
 
-        Button(
-            onClick = onStartTraining,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(62.dp),
-            shape = RoundedCornerShape(20.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary,
-            ),
-        ) {
-            Text(
-                text = if (activeSession != null) {
-                    "Reprendre · ${activeSession.questionIndex + 1}/20"
-                } else {
-                    "Commencer la session"
-                },
-            )
+        Column {
+            Button(
+                onClick = onStartTraining,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(62.dp),
+                enabled = activeSession?.mode != TrainingMode.FREE,
+                shape = RoundedCornerShape(20.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary,
+                ),
+            ) {
+                Text(
+                    if (activeSession?.mode == TrainingMode.GUIDED) {
+                        "Reprendre le guidé · ${activeSession.questionIndex + 1}/20"
+                    } else {
+                        "Session guidée · 20 questions"
+                    },
+                )
+            }
+            Spacer(Modifier.height(10.dp))
+            OutlinedButton(
+                onClick = onOpenFreeTraining,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp),
+                shape = RoundedCornerShape(18.dp),
+            ) {
+                Text(
+                    if (activeSession?.mode == TrainingMode.FREE) {
+                        "Reprendre le libre · ${activeSession.questionIndex + 1}/20"
+                    } else {
+                        "Entraînement libre"
+                    },
+                )
+            }
         }
     }
 }

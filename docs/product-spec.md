@@ -80,12 +80,18 @@ Après la réponse :
 - une erreur importante peut revenir dans la même session ;
 - terminer la session valide l'activité du jour pour la série.
 
+Dans l'interface, ce mode porte le nom **Session guidée**, car plusieurs blocs
+de 20 questions peuvent être réalisés dans une même journée. Seul le premier
+bloc guidé terminé entretient la série du jour.
+
 ### Entraînement libre
 
-- nombre de questions non limité ;
-- choix parmi les spots débloqués ;
-- les résultats alimentent les statistiques et la connaissance actuelle ;
-- il ne remplace pas la session quotidienne pour la série.
+- blocs de 20 questions répétables ;
+- choix parmi les spots débloqués dont la range est disponible ;
+- une bonne réponse rapporte de l'XP et alimente les statistiques libres ;
+- une bonne réponse ne compte pas dans les 30 réponses de maîtrise ;
+- une erreur rend la main prioritaire dans les futures sessions guidées ;
+- il ne remplace pas la session guidée pour la série.
 
 ## 7. Maîtrise d'un spot
 

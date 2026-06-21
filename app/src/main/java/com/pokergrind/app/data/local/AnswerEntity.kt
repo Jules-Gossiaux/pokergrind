@@ -11,6 +11,7 @@ import androidx.room.Index
 data class AnswerEntity(
     val sessionId: String,
     val questionIndex: Int,
+    val mode: String,
     val spotId: String,
     val handNotation: String,
     val expectedAction: String,

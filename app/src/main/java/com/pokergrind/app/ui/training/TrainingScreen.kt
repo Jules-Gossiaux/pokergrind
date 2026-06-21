@@ -40,6 +40,7 @@ import com.pokergrind.app.data.local.StoredTrainingSession
 import com.pokergrind.app.domain.model.HandCategory
 import com.pokergrind.app.domain.model.PokerAction
 import com.pokergrind.app.domain.model.RangeDefinition
+import com.pokergrind.app.domain.training.TrainingMode
 import com.pokergrind.app.ui.range.RangeDialog
 import com.pokergrind.app.ui.theme.Error
 import com.pokergrind.app.ui.theme.Progress
@@ -60,9 +61,10 @@ fun TrainingScreen(
 ) {
     var showRange by remember { mutableStateOf(false) }
     val currentHand = session?.let { currentSession ->
-        currentSession.hands
-            .getOrNull(currentSession.questionIndex)
-            ?.let { notation -> range.entries.firstOrNull { it.hand.notation == notation }?.hand }
+        currentSession.currentQuestion
+            ?.let { question ->
+                range.entries.firstOrNull { it.hand.notation == question.handNotation }?.hand
+            }
     }
 
     if (showRange) {
@@ -83,6 +85,7 @@ fun TrainingScreen(
             session == null -> LoadingSession()
             session.isComplete -> SessionSummary(
                 correctCount = session.correctCount,
+                mode = session.mode,
                 onRestart = onRestart,
                 onBack = onBack,
             )
@@ -144,7 +147,7 @@ private fun ColumnScope.QuestionContent(
             Text("Quitter")
         }
         Text(
-            text = "${session.questionIndex + 1} / ${session.hands.size}",
+            text = "${session.questionIndex + 1} / ${session.questions.size}",
             color = TextSecondary,
             fontWeight = FontWeight.SemiBold,
         )
@@ -152,7 +155,7 @@ private fun ColumnScope.QuestionContent(
 
     Spacer(Modifier.height(14.dp))
     LinearProgressIndicator(
-        progress = { (session.questionIndex + 1f) / session.hands.size },
+        progress = { (session.questionIndex + 1f) / session.questions.size },
         modifier = Modifier
             .fillMaxWidth()
             .height(7.dp)
@@ -169,7 +172,7 @@ private fun ColumnScope.QuestionContent(
         verticalArrangement = Arrangement.Center,
     ) {
         Text(
-            text = "OPEN BTN",
+            text = if (session.mode == TrainingMode.GUIDED) "SESSION GUIDÉE" else "ENTRAÎNEMENT LIBRE",
             color = MaterialTheme.colorScheme.primary,
             fontSize = 12.sp,
             fontWeight = FontWeight.Bold,
@@ -299,6 +302,7 @@ private fun ActionButton(
 @Composable
 private fun SessionSummary(
     correctCount: Int,
+    mode: TrainingMode,
     onRestart: () -> Unit,
     onBack: () -> Unit,
 ) {
@@ -308,7 +312,11 @@ private fun SessionSummary(
         verticalArrangement = Arrangement.Center,
     ) {
         Text(
-            text = "SESSION TERMINÉE",
+            text = if (mode == TrainingMode.GUIDED) {
+                "SESSION GUIDÉE TERMINÉE"
+            } else {
+                "ENTRAÎNEMENT TERMINÉ"
+            },
             color = MaterialTheme.colorScheme.primary,
             fontSize = 12.sp,
             fontWeight = FontWeight.Bold,
@@ -329,6 +337,13 @@ private fun SessionSummary(
             color = Progress,
             fontWeight = FontWeight.SemiBold,
         )
+        if (mode == TrainingMode.FREE) {
+            Spacer(Modifier.height(8.dp))
+            Text(
+                "Les erreurs ont été ajoutées aux priorités du guidé.",
+                color = TextSecondary,
+            )
+        }
         Spacer(Modifier.height(40.dp))
         Button(
             onClick = onBack,

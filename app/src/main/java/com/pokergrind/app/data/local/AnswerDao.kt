@@ -15,9 +15,13 @@ interface AnswerDao {
         """
         SELECT * FROM answers
         WHERE spotId = :spotId
+          AND mode = 'GUIDED'
         ORDER BY answeredAtEpochMillis DESC
         LIMIT :limit
         """,
     )
     fun observeRecent(spotId: String, limit: Int): Flow<List<AnswerEntity>>
+
+    @Query("SELECT COUNT(*) FROM answers WHERE mode = 'FREE'")
+    fun observeFreeAnswerCount(): Flow<Int>
 }

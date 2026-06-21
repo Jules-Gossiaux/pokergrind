@@ -37,3 +37,12 @@ encore de version publiée.
 - déblocage automatique et réversible d'Open CO ;
 - protection contre le double enregistrement d'une même réponse ;
 - schéma Room versionné pour préparer les futures migrations.
+- modes distincts Session guidée et Entraînement libre ;
+- sélecteur de position pour le mode libre ;
+- certification alimentée uniquement par les réponses guidées ;
+- erreurs libres transformées en priorités pour le guidé ;
+- répétition d'une erreur guidée environ trois questions plus tard ;
+- répétition espacée par couple spot-main avec intervalles 1, 3, 7, 14 jours et plus ;
+- planificateur guidé compatible avec plusieurs ranges débloquées ;
+- déblocages de spots conservés définitivement ;
+- migration Room 1 vers 2 sans perte de progression.

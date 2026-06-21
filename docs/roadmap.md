@@ -36,9 +36,9 @@ spot.
 
 ## Étape 3 — Boucle quotidienne
 
-- répétition espacée ;
-- session quotidienne de 20 questions ;
-- entraînement libre ;
+- répétition espacée — première version réalisée ;
+- sessions guidées de 20 questions — réalisé ;
+- entraînement libre ciblé — réalisé pour BTN ;
 - XP, statistiques et série quotidienne ;
 - reprise d'une session interrompue.
 

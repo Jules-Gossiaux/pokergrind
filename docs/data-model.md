@@ -90,6 +90,9 @@ Dans l'implémentation Room, la clé primaire combine l'identifiant de session e
 l'index de la question. Une même question ne peut donc pas être enregistrée
 deux fois, même après un double appui ou une reprise.
 
+Chaque réponse possède également un mode `GUIDED` ou `FREE`. Les requêtes de
+maîtrise filtrent explicitement le mode guidé.
+
 ### TrainingSession
 
 - type : quotidienne ou libre ;
@@ -146,6 +149,11 @@ Room est désormais utilisé pour l'historique immuable des réponses :
 - temps de réponse ;
 - horodatage ;
 - session et index de question.
+
+Room contient aussi :
+
+- `review_items`, un état de répétition par couple spot-main ;
+- `spot_unlocks`, la liste permanente des spots déjà débloqués.
 
 DataStore reste responsable du petit état transactionnel de l'interface :
 session en cours, XP et série.

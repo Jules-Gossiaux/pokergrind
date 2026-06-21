@@ -1,0 +1,183 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 2,
+    "identityHash": "6386a77e47c8f3101b26f2b4d7a97937",
+    "entities": [
+      {
+        "tableName": "answers",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`sessionId` TEXT NOT NULL, `questionIndex` INTEGER NOT NULL, `mode` TEXT NOT NULL, `spotId` TEXT NOT NULL, `handNotation` TEXT NOT NULL, `expectedAction` TEXT NOT NULL, `chosenAction` TEXT NOT NULL, `isCorrect` INTEGER NOT NULL, `responseTimeMillis` INTEGER NOT NULL, `answeredAtEpochMillis` INTEGER NOT NULL, PRIMARY KEY(`sessionId`, `questionIndex`))",
+        "fields": [
+          {
+            "fieldPath": "sessionId",
+            "columnName": "sessionId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "questionIndex",
+            "columnName": "questionIndex",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mode",
+            "columnName": "mode",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "spotId",
+            "columnName": "spotId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "handNotation",
+            "columnName": "handNotation",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "expectedAction",
+            "columnName": "expectedAction",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "chosenAction",
+            "columnName": "chosenAction",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isCorrect",
+            "columnName": "isCorrect",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "responseTimeMillis",
+            "columnName": "responseTimeMillis",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "answeredAtEpochMillis",
+            "columnName": "answeredAtEpochMillis",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "sessionId",
+            "questionIndex"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_answers_spotId_answeredAtEpochMillis",
+            "unique": false,
+            "columnNames": [
+              "spotId",
+              "answeredAtEpochMillis"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_answers_spotId_answeredAtEpochMillis` ON `${TABLE_NAME}` (`spotId`, `answeredAtEpochMillis`)"
+          }
+        ]
+      },
+      {
+        "tableName": "review_items",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`spotId` TEXT NOT NULL, `handNotation` TEXT NOT NULL, `dueAtEpochMillis` INTEGER NOT NULL, `intervalDays` INTEGER NOT NULL, `stage` INTEGER NOT NULL, `lapses` INTEGER NOT NULL, `priorityBoost` INTEGER NOT NULL, `lastReviewedAtEpochMillis` INTEGER NOT NULL, PRIMARY KEY(`spotId`, `handNotation`))",
+        "fields": [
+          {
+            "fieldPath": "spotId",
+            "columnName": "spotId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "handNotation",
+            "columnName": "handNotation",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dueAtEpochMillis",
+            "columnName": "dueAtEpochMillis",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "intervalDays",
+            "columnName": "intervalDays",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "stage",
+            "columnName": "stage",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lapses",
+            "columnName": "lapses",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "priorityBoost",
+            "columnName": "priorityBoost",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lastReviewedAtEpochMillis",
+            "columnName": "lastReviewedAtEpochMillis",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "spotId",
+            "handNotation"
+          ]
+        }
+      },
+      {
+        "tableName": "spot_unlocks",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`spotId` TEXT NOT NULL, `unlockedAtEpochMillis` INTEGER NOT NULL, PRIMARY KEY(`spotId`))",
+        "fields": [
+          {
+            "fieldPath": "spotId",
+            "columnName": "spotId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "unlockedAtEpochMillis",
+            "columnName": "unlockedAtEpochMillis",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "spotId"
+          ]
+        }
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '6386a77e47c8f3101b26f2b4d7a97937')"
+    ]
+  }
+}

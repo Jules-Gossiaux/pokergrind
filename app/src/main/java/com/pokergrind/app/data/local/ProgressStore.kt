@@ -8,6 +8,7 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.pokergrind.app.domain.model.PokerAction
 import com.pokergrind.app.domain.training.ProgressionRules
+import com.pokergrind.app.domain.training.TrainingMode
 import java.io.IOException
 import java.time.LocalDate
 import java.util.UUID
@@ -17,15 +18,24 @@ import kotlinx.coroutines.flow.map
 
 private val Context.progressDataStore by preferencesDataStore(name = "pokergrind_progress")
 
+data class StoredQuestion(
+    val spotId: String,
+    val handNotation: String,
+)
+
 data class StoredTrainingSession(
     val id: String,
-    val hands: List<String>,
+    val mode: TrainingMode,
+    val questions: List<StoredQuestion>,
     val questionIndex: Int,
     val correctCount: Int,
     val selectedAction: PokerAction?,
 ) {
     val isComplete: Boolean
-        get() = hands.isNotEmpty() && questionIndex >= hands.size
+        get() = questions.isNotEmpty() && questionIndex >= questions.size
+
+    val currentQuestion: StoredQuestion?
+        get() = questions.getOrNull(questionIndex)
 }
 
 data class StoredProgress(
@@ -43,10 +53,14 @@ class ProgressStore(private val context: Context) {
         }
         .map(::toStoredProgress)
 
-    suspend fun startSession(hands: List<String>) {
+    suspend fun startSession(
+        mode: TrainingMode,
+        questions: List<StoredQuestion>,
+    ) {
         context.progressDataStore.edit { preferences ->
             preferences[SESSION_ID] = UUID.randomUUID().toString()
-            preferences[SESSION_HANDS] = hands.joinToString(",")
+            preferences[SESSION_MODE] = mode.name
+            preferences[SESSION_QUESTIONS] = encodeQuestions(questions)
             preferences[SESSION_INDEX] = 0
             preferences[SESSION_CORRECT] = 0
             preferences.remove(SESSION_SELECTED_ACTION)
@@ -66,23 +80,53 @@ class ProgressStore(private val context: Context) {
 
     suspend fun moveToNextQuestion() {
         context.progressDataStore.edit { preferences ->
-            val hands = decodeHands(preferences[SESSION_HANDS])
+            val questions = decodeQuestions(
+                preferences[SESSION_QUESTIONS] ?: preferences[LEGACY_SESSION_HANDS],
+            )
             val nextIndex = (preferences[SESSION_INDEX] ?: 0) + 1
             preferences[SESSION_INDEX] = nextIndex
             preferences.remove(SESSION_SELECTED_ACTION)
 
-            if (hands.isNotEmpty() && nextIndex >= hands.size) {
+            val mode = preferences[SESSION_MODE]
+                ?.let { runCatching { TrainingMode.valueOf(it) }.getOrNull() }
+                ?: TrainingMode.GUIDED
+            if (mode == TrainingMode.GUIDED && questions.isNotEmpty() && nextIndex >= questions.size) {
                 updateStreak(preferences, LocalDate.now())
             }
         }
     }
 
+    suspend fun scheduleRetry(question: StoredQuestion) {
+        context.progressDataStore.edit { preferences ->
+            val questions = decodeQuestions(
+                preferences[SESSION_QUESTIONS] ?: preferences[LEGACY_SESSION_HANDS],
+            ).toMutableList()
+            val currentIndex = preferences[SESSION_INDEX] ?: 0
+            if (questions.isEmpty() || currentIndex >= questions.lastIndex) return@edit
+
+            val insertionIndex = (currentIndex + RETRY_GAP + 1).coerceAtMost(questions.lastIndex)
+            val alreadySoon = questions
+                .subList(currentIndex + 1, insertionIndex + 1)
+                .any { it == question }
+            if (alreadySoon) return@edit
+
+            questions.add(insertionIndex, question)
+            if (questions.size > SESSION_SIZE) questions.removeAt(questions.lastIndex)
+            preferences[SESSION_QUESTIONS] = encodeQuestions(questions)
+        }
+    }
+
     private fun toStoredProgress(preferences: Preferences): StoredProgress {
-        val hands = decodeHands(preferences[SESSION_HANDS])
-        val session = hands.takeIf { it.isNotEmpty() }?.let {
+        val questions = decodeQuestions(
+            preferences[SESSION_QUESTIONS] ?: preferences[LEGACY_SESSION_HANDS],
+        )
+        val session = questions.takeIf { it.isNotEmpty() }?.let {
             StoredTrainingSession(
                 id = preferences[SESSION_ID] ?: "legacy-session",
-                hands = it,
+                mode = preferences[SESSION_MODE]
+                    ?.let { value -> runCatching { TrainingMode.valueOf(value) }.getOrNull() }
+                    ?: TrainingMode.GUIDED,
+                questions = it,
                 questionIndex = preferences[SESSION_INDEX] ?: 0,
                 correctCount = preferences[SESSION_CORRECT] ?: 0,
                 selectedAction = preferences[SESSION_SELECTED_ACTION]
@@ -114,19 +158,35 @@ class ProgressStore(private val context: Context) {
         preferences[LAST_COMPLETED_DATE] = today.toString()
     }
 
-    private fun decodeHands(value: String?): List<String> =
+    private fun encodeQuestions(questions: List<StoredQuestion>): String =
+        questions.joinToString(";") { "${it.spotId}|${it.handNotation}" }
+
+    private fun decodeQuestions(value: String?): List<StoredQuestion> =
         value
-            ?.split(",")
-            ?.filter(String::isNotBlank)
+            ?.split(";", ",")
+            ?.mapNotNull { encoded ->
+                if (encoded.isBlank()) return@mapNotNull null
+                val parts = encoded.split("|", limit = 2)
+                if (parts.size == 2) {
+                    StoredQuestion(parts[0], parts[1])
+                } else {
+                    StoredQuestion(LEGACY_BTN_SPOT_ID, encoded)
+                }
+            }
             .orEmpty()
 
     companion object {
         const val XP_PER_CORRECT_ANSWER = 10
+        private const val SESSION_SIZE = 20
+        private const val RETRY_GAP = 3
+        private const val LEGACY_BTN_SPOT_ID = "open_btn_100bb_v1"
 
         private val XP = intPreferencesKey("xp")
         private val STREAK = intPreferencesKey("streak")
         private val LAST_COMPLETED_DATE = stringPreferencesKey("last_completed_date")
-        private val SESSION_HANDS = stringPreferencesKey("session_hands")
+        private val LEGACY_SESSION_HANDS = stringPreferencesKey("session_hands")
+        private val SESSION_QUESTIONS = stringPreferencesKey("session_questions")
+        private val SESSION_MODE = stringPreferencesKey("session_mode")
         private val SESSION_ID = stringPreferencesKey("session_id")
         private val SESSION_INDEX = intPreferencesKey("session_index")
         private val SESSION_CORRECT = intPreferencesKey("session_correct")
