@@ -1,0 +1,20 @@
+# Local poker range references supplied by the project owner.
+# These images are working material only and must not be packaged in the app.
+/ranges/
+
+# Android / Gradle
+.gradle/
+build/
+**/build/
+local.properties
+*.iml
+.idea/
+
+# Signing material
+*.jks
+*.keystore
+keystore.properties
+
+# OS
+.DS_Store
+Thumbs.db
