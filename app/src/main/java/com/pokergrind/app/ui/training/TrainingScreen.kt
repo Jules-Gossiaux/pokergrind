@@ -53,7 +53,7 @@ import kotlinx.coroutines.delay
 fun TrainingScreen(
     range: RangeDefinition,
     session: StoredTrainingSession?,
-    onAnswer: (PokerAction) -> Unit,
+    onAnswer: (PokerAction, Long) -> Unit,
     onNext: () -> Unit,
     onRestart: () -> Unit,
     onBack: () -> Unit,
@@ -115,7 +115,7 @@ private fun ColumnScope.QuestionContent(
     range: RangeDefinition,
     hand: HandCategory,
     session: StoredTrainingSession,
-    onAnswer: (PokerAction) -> Unit,
+    onAnswer: (PokerAction, Long) -> Unit,
     onNext: () -> Unit,
     onShowRange: () -> Unit,
     onBack: () -> Unit,
@@ -220,14 +220,14 @@ private fun ColumnScope.QuestionContent(
                 modifier = Modifier.weight(1f),
                 containerColor = SurfaceElevated,
                 contentColor = MaterialTheme.colorScheme.onSurface,
-                onClick = { onAnswer(PokerAction.FOLD) },
+                onClick = { onAnswer(PokerAction.FOLD, elapsedSeconds * 1_000L) },
             )
             ActionButton(
                 label = "Open 2,5 BB",
                 modifier = Modifier.weight(1f),
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary,
-                onClick = { onAnswer(PokerAction.OPEN) },
+                onClick = { onAnswer(PokerAction.OPEN, elapsedSeconds * 1_000L) },
             )
         }
     } else {

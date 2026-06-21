@@ -17,7 +17,8 @@ Cette feuille de route décrit l'ordre de travail, pas des dates de livraison.
 - feedback immédiat — réalisé ;
 - matrice `Voir la range` — réalisé ;
 - persistance de la session, XP et série — réalisé ;
-- historique détaillé des réponses — à réaliser avec Room ;
+- historique détaillé des réponses avec Room — réalisé ;
+- maîtrise glissante et déblocage d'Open CO — réalisé ;
 - tests du domaine — réalisés ;
 - test du parcours sur émulateur ou appareil — à réaliser.
 
@@ -26,10 +27,11 @@ spot.
 
 ## Étape 2 — Parcours des open ranges
 
-- CO, HJ, UTG et SB ;
-- déblocage pédagogique ;
-- maîtrise sur les 30 dernières réponses ;
-- couverture et diversité ;
+- intégration de la range CO ;
+- puis HJ, UTG et SB ;
+- déblocage pédagogique — réalisé pour BTN vers CO ;
+- maîtrise sur les 30 dernières réponses — réalisé ;
+- couverture et diversité — réalisé pour Open/Fold ;
 - progression par spot.
 
 ## Étape 3 — Boucle quotidienne

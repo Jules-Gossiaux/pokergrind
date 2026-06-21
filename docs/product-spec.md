@@ -108,6 +108,14 @@ Dans le parcours, l'objectif principal est formulé simplement comme
 `27 bonnes réponses sur les 30 dernières`. La condition de diversité reste
 contrôlée par le moteur, sans alourdir l'écran principal.
 
+Pour le premier calibrage, la diversité exige au moins :
+
+- 8 catégories de mains distinctes dont l'action attendue est Open ;
+- 8 catégories de mains distinctes dont l'action attendue est Fold.
+
+Lorsque toutes les conditions sont remplies, Open CO est débloqué. La maîtrise
+est recalculée après chaque réponse et peut être perdue.
+
 ## 8. Progression et statistiques
 
 La V1 comprend :

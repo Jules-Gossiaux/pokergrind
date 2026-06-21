@@ -31,3 +31,9 @@ encore de version publiée.
 - action explicite `Open 2,5 BB` dans l'entraînement.
 - critère de déblocage du prochain spot affiché dans le parcours ;
 - connecteurs du parcours conservés neutres tant que le spot suivant est verrouillé.
+- historique structuré de chaque réponse avec Room ;
+- progression BTN calculée sur une fenêtre glissante de 30 réponses ;
+- validation de la maîtrise à 27/30 avec diversité minimale Open/Fold ;
+- déblocage automatique et réversible d'Open CO ;
+- protection contre le double enregistrement d'une même réponse ;
+- schéma Room versionné pour préparer les futures migrations.

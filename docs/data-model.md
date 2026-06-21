@@ -86,6 +86,10 @@ Les images originales ne font pas partie du modèle livré.
 L'historique permet de recalculer les statistiques et la maîtrise sans dépendre
 d'un compteur fragile.
 
+Dans l'implémentation Room, la clé primaire combine l'identifiant de session et
+l'index de la question. Une même question ne peut donc pas être enregistrée
+deux fois, même après un double appui ou une reprise.
+
 ### TrainingSession
 
 - type : quotidienne ou libre ;
@@ -134,8 +138,17 @@ Le premier incrément utilise DataStore pour conserver :
 - le total d'XP ;
 - la série et la date de dernière session terminée.
 
-Room sera introduit lorsque l'historique détaillé des réponses et la répétition
-espacée nécessiteront des requêtes structurées.
+Room est désormais utilisé pour l'historique immuable des réponses :
+
+- spot et catégorie de main ;
+- action attendue et choisie ;
+- résultat ;
+- temps de réponse ;
+- horodatage ;
+- session et index de question.
+
+DataStore reste responsable du petit état transactionnel de l'interface :
+session en cours, XP et série.
 
 ## 5. Validation des ranges
 

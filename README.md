@@ -84,5 +84,6 @@ L'APK de debug est généré dans `app/build/outputs/apk/debug/`.
 
 La première tranche verticale Open BTN est disponible : accueil, chemin de
 progression Fondations, session persistante et équilibrée de 20 questions,
-XP, série quotidienne, chronomètre informatif, feedback Open/Fold et matrice
-native de la range.
+XP, série quotidienne, historique Room, maîtrise sur les 30 dernières
+réponses, déblocage d'Open CO, chronomètre informatif, feedback Open/Fold et
+matrice native de la range.

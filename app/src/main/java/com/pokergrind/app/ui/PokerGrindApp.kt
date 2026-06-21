@@ -49,6 +49,7 @@ fun PokerGrindApp(viewModel: PokerGrindViewModel = viewModel()) {
                 xp = uiState.xp,
                 streak = uiState.streak,
                 activeSession = uiState.session?.takeUnless { it.isComplete },
+                btnMastery = uiState.btnMastery,
                 onStartTraining = {
                     viewModel.startOrResumeSession()
                     destination = Destination.TRAINING

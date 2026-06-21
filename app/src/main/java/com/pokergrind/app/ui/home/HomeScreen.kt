@@ -31,6 +31,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.pokergrind.app.data.local.StoredTrainingSession
 import com.pokergrind.app.domain.model.RangeDefinition
+import com.pokergrind.app.domain.training.MasteryCalculator
+import com.pokergrind.app.domain.training.SpotMastery
 import com.pokergrind.app.ui.theme.Progress
 import com.pokergrind.app.ui.theme.SurfaceElevated
 import com.pokergrind.app.ui.theme.SurfaceSoft
@@ -42,6 +44,7 @@ fun HomeScreen(
     xp: Int,
     streak: Int,
     activeSession: StoredTrainingSession?,
+    btnMastery: SpotMastery,
     onStartTraining: () -> Unit,
 ) {
     Column(
@@ -108,7 +111,11 @@ fun HomeScreen(
                 style = MaterialTheme.typography.headlineMedium,
             )
             Text(
-                text = "Le prochain spot se débloque à 90 % de réussite sur tes 30 dernières réponses.",
+                text = if (btnMastery.isMastered) {
+                    "Open BTN maîtrisé. Le prochain spot est débloqué."
+                } else {
+                    "Le prochain spot se débloque à 90 % de réussite sur tes 30 dernières réponses."
+                },
                 color = TextSecondary,
             )
 
@@ -121,9 +128,19 @@ fun HomeScreen(
                     "Session en cours · ${(it.questionIndex + 1).coerceAtMost(it.hands.size)}/${it.hands.size}"
                 } ?: "${range.stackDepthBb} BB · Open 2,5 BB",
                 isActive = true,
-                unlockHint = "Objectif : 27 bonnes réponses sur les 30 dernières",
+                unlockHint = masteryLabel(btnMastery),
+                connectorUnlocked = btnMastery.isMastered,
             )
-            PathStep(number = 2, title = "Open CO", subtitle = "À débloquer")
+            PathStep(
+                number = 2,
+                title = "Open CO",
+                subtitle = if (btnMastery.isMastered) {
+                    "Débloqué · range à intégrer"
+                } else {
+                    "À débloquer"
+                },
+                isUnlocked = btnMastery.isMastered,
+            )
             PathStep(number = 3, title = "Open HJ", subtitle = "À débloquer")
             PathStep(number = 4, title = "Open UTG", subtitle = "À débloquer")
             PathStep(number = 5, title = "Open SB", subtitle = "À débloquer", showConnector = false)
@@ -183,7 +200,9 @@ private fun PathStep(
     title: String,
     subtitle: String,
     isActive: Boolean = false,
+    isUnlocked: Boolean = false,
     unlockHint: String? = null,
+    connectorUnlocked: Boolean = false,
     showConnector: Boolean = true,
 ) {
     Row(
@@ -195,14 +214,18 @@ private fun PathStep(
                 modifier = Modifier
                     .size(42.dp)
                     .background(
-                        color = if (isActive) MaterialTheme.colorScheme.primary else SurfaceElevated,
+                        color = if (isActive || isUnlocked) {
+                            MaterialTheme.colorScheme.primary
+                        } else {
+                            SurfaceElevated
+                        },
                         shape = CircleShape,
                     ),
                 contentAlignment = Alignment.Center,
             ) {
                 Text(
                     text = number.toString(),
-                    color = if (isActive) MaterialTheme.colorScheme.onPrimary else TextSecondary,
+                    color = if (isActive || isUnlocked) MaterialTheme.colorScheme.onPrimary else TextSecondary,
                     fontWeight = FontWeight.Bold,
                 )
             }
@@ -210,7 +233,13 @@ private fun PathStep(
                 Box(
                     modifier = Modifier
                         .size(width = 2.dp, height = 28.dp)
-                        .background(SurfaceElevated),
+                        .background(
+                            if (connectorUnlocked) {
+                                MaterialTheme.colorScheme.primary.copy(alpha = 0.55f)
+                            } else {
+                                SurfaceElevated
+                            },
+                        ),
                 )
             }
         }
@@ -220,20 +249,24 @@ private fun PathStep(
                 .padding(start = 12.dp, bottom = 10.dp)
                 .fillMaxWidth(),
             colors = CardDefaults.cardColors(
-                containerColor = if (isActive) SurfaceElevated else Color.Transparent,
+                containerColor = if (isActive || isUnlocked) SurfaceElevated else Color.Transparent,
             ),
             shape = RoundedCornerShape(18.dp),
         ) {
             Column(Modifier.padding(horizontal = 16.dp, vertical = 11.dp)) {
                 Text(
                     text = title,
-                    color = if (isActive) MaterialTheme.colorScheme.onSurface else TextSecondary,
+                    color = if (isActive || isUnlocked) MaterialTheme.colorScheme.onSurface else TextSecondary,
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 17.sp,
                 )
                 Text(
                     text = subtitle,
-                    color = if (isActive) MaterialTheme.colorScheme.primary else TextSecondary.copy(alpha = 0.65f),
+                    color = if (isActive || isUnlocked) {
+                        MaterialTheme.colorScheme.primary
+                    } else {
+                        TextSecondary.copy(alpha = 0.65f)
+                    },
                     fontSize = 14.sp,
                 )
                 if (unlockHint != null) {
@@ -247,4 +280,13 @@ private fun PathStep(
             }
         }
     }
+}
+
+private fun masteryLabel(mastery: SpotMastery): String = when {
+    mastery.isMastered -> "Maîtrisé · ${mastery.correctCount}/30 · ${mastery.successRatePercent} %"
+    mastery.answerCount < MasteryCalculator.WINDOW_SIZE ->
+        "Progression : ${mastery.answerCount}/30 réponses · encore ${mastery.answersRemaining}"
+    else ->
+        "${mastery.correctCount}/30 correctes · ${mastery.successRatePercent} % · diversité " +
+            "${mastery.distinctOpenHands}/8 Open, ${mastery.distinctFoldHands}/8 Fold"
 }

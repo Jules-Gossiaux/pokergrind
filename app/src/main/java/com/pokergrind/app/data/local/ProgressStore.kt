@@ -10,6 +10,7 @@ import com.pokergrind.app.domain.model.PokerAction
 import com.pokergrind.app.domain.training.ProgressionRules
 import java.io.IOException
 import java.time.LocalDate
+import java.util.UUID
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
@@ -17,6 +18,7 @@ import kotlinx.coroutines.flow.map
 private val Context.progressDataStore by preferencesDataStore(name = "pokergrind_progress")
 
 data class StoredTrainingSession(
+    val id: String,
     val hands: List<String>,
     val questionIndex: Int,
     val correctCount: Int,
@@ -43,6 +45,7 @@ class ProgressStore(private val context: Context) {
 
     suspend fun startSession(hands: List<String>) {
         context.progressDataStore.edit { preferences ->
+            preferences[SESSION_ID] = UUID.randomUUID().toString()
             preferences[SESSION_HANDS] = hands.joinToString(",")
             preferences[SESSION_INDEX] = 0
             preferences[SESSION_CORRECT] = 0
@@ -78,6 +81,7 @@ class ProgressStore(private val context: Context) {
         val hands = decodeHands(preferences[SESSION_HANDS])
         val session = hands.takeIf { it.isNotEmpty() }?.let {
             StoredTrainingSession(
+                id = preferences[SESSION_ID] ?: "legacy-session",
                 hands = it,
                 questionIndex = preferences[SESSION_INDEX] ?: 0,
                 correctCount = preferences[SESSION_CORRECT] ?: 0,
@@ -123,6 +127,7 @@ class ProgressStore(private val context: Context) {
         private val STREAK = intPreferencesKey("streak")
         private val LAST_COMPLETED_DATE = stringPreferencesKey("last_completed_date")
         private val SESSION_HANDS = stringPreferencesKey("session_hands")
+        private val SESSION_ID = stringPreferencesKey("session_id")
         private val SESSION_INDEX = intPreferencesKey("session_index")
         private val SESSION_CORRECT = intPreferencesKey("session_correct")
         private val SESSION_SELECTED_ACTION = stringPreferencesKey("session_selected_action")
