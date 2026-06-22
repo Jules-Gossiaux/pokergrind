@@ -37,7 +37,7 @@ Le premier incrément couvre uniquement les open ranges, dans cet ordre :
 
 Un spot verrouillé devient disponible lorsque le spot précédent est maîtrisé.
 
-Open BTN et Open CO sont actuellement intégrés. Les sessions guidées
+Les cinq ranges d'open sont intégrées. Les sessions guidées
 garantissent qu'au moins quatre questions proviennent de chaque range
 débloquée et disponible, avant de consacrer le reste du budget aux révisions
 les plus prioritaires.
@@ -75,6 +75,9 @@ Après la réponse :
 - le bouton `Voir la range` ouvre une matrice reconstruite par l'application ;
 - l'utilisateur peut rapidement passer à la question suivante.
 
+Chaque range débloquée peut également être consultée depuis sa carte sur
+l'accueil, sans lancer une session.
+
 ## 6. Modes
 
 ### Session quotidienne
@@ -97,6 +100,8 @@ bloc guidé terminé entretient la série du jour.
 - une bonne réponse ne compte pas dans les 30 réponses de maîtrise ;
 - une erreur rend la main prioritaire dans les futures sessions guidées ;
 - il ne remplace pas la session guidée pour la série.
+- quitter une session libre l'abandonne ;
+- démarrer une session guidée remplace une éventuelle session libre en cours.
 
 ## 7. Maîtrise d'un spot
 
@@ -124,8 +129,9 @@ Pour le premier calibrage, la diversité exige au moins :
 - 8 catégories de mains distinctes dont l'action attendue est Open ;
 - 8 catégories de mains distinctes dont l'action attendue est Fold.
 
-Lorsque toutes les conditions sont remplies, Open CO est débloqué. La maîtrise
-est recalculée après chaque réponse et peut être perdue.
+Lorsque toutes les conditions sont remplies, le spot suivant est débloqué. La
+maîtrise est recalculée après chaque réponse et peut être perdue, sans
+reverrouiller les spots déjà atteints.
 
 ## 8. Progression et statistiques
 
@@ -145,8 +151,15 @@ Barème du premier incrément :
 - une bonne réponse rapporte 10 XP ;
 - une erreur ne retire pas d'XP ;
 - la série est validée une seule fois par jour, à la fin des 20 questions ;
-- une session interrompue reprend à la question exacte, avec son score et son
-  feedback conservés.
+- une session guidée interrompue reprend à la question exacte, avec son score
+  et son feedback conservés ;
+- une session libre est volontairement abandonnée lorsque l'utilisateur la
+  quitte.
+
+L'écran Statistiques affiche une matrice par spot. Le remplissage représente le
+taux de réussite historique de la main et la couleur indique son niveau :
+vert à partir de 90 %, orange entre 80 et 89 %, rouge sous 80 %, gris sans
+réponse guidée.
 
 ## 9. Hors périmètre
 

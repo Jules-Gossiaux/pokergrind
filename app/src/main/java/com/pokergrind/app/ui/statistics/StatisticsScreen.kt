@@ -1,6 +1,7 @@
 package com.pokergrind.app.ui.statistics
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -42,6 +43,7 @@ import com.pokergrind.app.domain.statistics.HandStatistics
 import com.pokergrind.app.domain.statistics.StatisticsSnapshot
 import com.pokergrind.app.domain.training.SpotMastery
 import com.pokergrind.app.ui.theme.Error
+import com.pokergrind.app.ui.theme.MasteryMedium
 import com.pokergrind.app.ui.theme.RangeFold
 import com.pokergrind.app.ui.theme.Success
 import com.pokergrind.app.ui.theme.SurfaceElevated
@@ -171,7 +173,7 @@ fun StatisticsScreen(
 private fun MasteryMatrix(handStats: Map<String, HandStatistics>) {
     Text("Maîtrise par main", style = MaterialTheme.typography.headlineMedium)
     Text(
-        "Vert : taux de réussite · gris : jamais vue",
+        "Vert ≥ 90 % · orange 80–89 % · rouge < 80 % · gris : jamais vue",
         color = TextSecondary,
         fontSize = 13.sp,
     )
@@ -204,11 +206,24 @@ private fun MasteryCell(
     hasAnswers: Boolean,
     modifier: Modifier = Modifier,
 ) {
+    val masteryColor = when {
+        !hasAnswers -> RangeFold
+        mastery >= 90 -> Success
+        mastery >= 80 -> MasteryMedium
+        else -> Error
+    }
     Box(
         modifier = modifier
             .aspectRatio(1f)
             .clip(RoundedCornerShape(4.dp))
-            .background(RangeFold),
+            .background(RangeFold)
+            .then(
+                if (hasAnswers) {
+                    Modifier.border(1.dp, masteryColor.copy(alpha = 0.8f), RoundedCornerShape(4.dp))
+                } else {
+                    Modifier
+                },
+            ),
     ) {
         if (hasAnswers && mastery > 0) {
             Box(
@@ -216,7 +231,7 @@ private fun MasteryCell(
                     .align(Alignment.BottomCenter)
                     .fillMaxWidth()
                     .fillMaxHeight(mastery.coerceIn(0, 100) / 100f)
-                    .background(Success.copy(alpha = 0.9f)),
+                    .background(masteryColor.copy(alpha = 0.9f)),
             )
         }
         Text(

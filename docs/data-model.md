@@ -17,10 +17,13 @@ La notation stockée est normalisée avec la carte la plus haute en premier.
 
 ### Action
 
-Actions prévues par le domaine :
+Actions actuellement implémentées par le domaine :
 
 - `OPEN`
 - `FOLD`
+
+Actions prévues pour les prochains modules :
+
 - `CALL`
 - `THREE_BET`
 - `FOUR_BET`
@@ -47,13 +50,10 @@ Un spot définit le contexte d'une décision :
 Associe chaque catégorie de main d'un spot à une unique action principale.
 Une définition valide contient exactement 169 entrées, sans doublon ni trou.
 
-Chaque range possède aussi :
-
-- une version ;
-- une description de provenance ;
-- une date de transcription ;
-- un statut de validation ;
-- une empreinte permettant de détecter une modification involontaire.
+La version est incluse dans l'identifiant, par exemple
+`open_btn_100bb_v1`. La provenance, la date de transcription, le statut de
+validation et les contrôles de frontière sont documentés dans `docs/ranges/`
+et verrouillés par les tests.
 
 Les images originales ne font pas partie du modèle livré.
 
@@ -95,14 +95,17 @@ maîtrise filtrent explicitement le mode guidé.
 
 ### TrainingSession
 
-- type : quotidienne ou libre ;
-- date de début et de fin ;
-- cible de questions ;
-- nombre de réponses ;
-- statut : en cours, terminée ou abandonnée.
+L'état persistant actuel contient :
+
+- identifiant de session ;
+- mode `GUIDED` ou `FREE` ;
+- liste ordonnée des 20 questions ;
+- index courant ;
+- nombre de bonnes réponses ;
+- action sélectionnée sur la question courante.
 
 Une série quotidienne n'est mise à jour qu'à la fin d'une session quotidienne
-complète.
+complète. Une session libre est supprimée lorsqu'elle est quittée.
 
 ### SpotProgress
 
@@ -120,15 +123,14 @@ depuis les résultats récents.
 
 ## 3. Progression globale
 
-Le profil local contient :
+Le profil local contient actuellement :
 
 - total d'XP ;
-- niveau dérivé de l'XP ;
-- série courante et meilleure série ;
+- série courante ;
 - date de dernière session quotidienne terminée.
 
-Le premier barème attribue 10 XP par bonne réponse. La courbe de niveaux reste
-à définir.
+Le barème attribue 10 XP par bonne réponse. Le niveau dérivé de l'XP et la
+meilleure série restent à définir.
 
 ## 4. Persistance du premier incrément
 

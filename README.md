@@ -54,6 +54,7 @@ La décision détaillée se trouve dans
 - [Transcription Open UTG](docs/ranges/open-utg.md)
 - [Transcription Open SB](docs/ranges/open-sb.md)
 - [Statistiques](docs/statistics.md)
+- [Installation sur téléphone](docs/installation.md)
 - [Feuille de route](docs/roadmap.md)
 - [Décisions d'architecture](docs/decisions/README.md)
 - [Historique des changements](CHANGELOG.md)
@@ -85,9 +86,15 @@ Commandes principales sous PowerShell :
 
 L'APK de debug est généré dans `app/build/outputs/apk/debug/`.
 
+Pour l'installer sans perdre les données existantes :
+
+```powershell
+D:\Android\sdk\platform-tools\adb.exe -s IDENTIFIANT_APPAREIL install -r D:\code\PokerGrind\app\build\outputs\apk\debug\app-debug.apk
+```
+
 ## État du projet
 
 Les cinq ranges d'open 6-max sont disponibles : parcours progressif,
 sessions guidées multi-spots, entraînement libre ciblé, répétition espacée,
 XP, série, table 6-max native, statistiques par spot et matrice de maîtrise,
-feedback Open/Fold et matrices de ranges natives.
+feedback Open/Fold et visualisation des ranges depuis l'accueil ou le feedback.

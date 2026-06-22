@@ -23,6 +23,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -35,6 +39,7 @@ import com.pokergrind.app.domain.model.RangeDefinition
 import com.pokergrind.app.domain.training.MasteryCalculator
 import com.pokergrind.app.domain.training.SpotMastery
 import com.pokergrind.app.domain.training.TrainingMode
+import com.pokergrind.app.ui.range.RangeDialog
 import com.pokergrind.app.ui.theme.Progress
 import com.pokergrind.app.ui.theme.SurfaceElevated
 import com.pokergrind.app.ui.theme.SurfaceSoft
@@ -54,6 +59,16 @@ fun HomeScreen(
 ) {
     val firstRange = ranges.first()
     val firstMastery = masteryBySpot[firstRange.id] ?: MasteryCalculator.empty
+    var displayedRange by remember { mutableStateOf<RangeDefinition?>(null) }
+
+    displayedRange?.let { range ->
+        RangeDialog(
+            range = range,
+            highlightedHand = null,
+            onDismiss = { displayedRange = null },
+        )
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -148,6 +163,11 @@ fun HomeScreen(
                     unlockHint = if (unlocked) masteryLabel(mastery) else null,
                     connectorUnlocked = ranges.getOrNull(index + 1)?.id in unlockedSpotIds,
                     showConnector = index < ranges.lastIndex,
+                    onViewRange = if (unlocked) {
+                        { displayedRange = range }
+                    } else {
+                        null
+                    },
                 )
             }
 
@@ -235,6 +255,7 @@ private fun PathStep(
     unlockHint: String? = null,
     connectorUnlocked: Boolean = false,
     showConnector: Boolean = true,
+    onViewRange: (() -> Unit)? = null,
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -284,13 +305,31 @@ private fun PathStep(
             ),
             shape = RoundedCornerShape(18.dp),
         ) {
-            Column(Modifier.padding(horizontal = 16.dp, vertical = 11.dp)) {
-                Text(
-                    text = title,
-                    color = if (isActive || isUnlocked) MaterialTheme.colorScheme.onSurface else TextSecondary,
-                    fontWeight = FontWeight.SemiBold,
-                    fontSize = 17.sp,
-                )
+            Column(
+                modifier = Modifier.padding(horizontal = 14.dp, vertical = 11.dp),
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                ) {
+                    Text(
+                        text = title,
+                        color = if (isActive || isUnlocked) MaterialTheme.colorScheme.onSurface else TextSecondary,
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 17.sp,
+                    )
+                    if (onViewRange != null) {
+                        OutlinedButton(
+                            onClick = onViewRange,
+                            modifier = Modifier.height(38.dp),
+                            shape = RoundedCornerShape(13.dp),
+                            contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 12.dp),
+                        ) {
+                            Text("Voir", fontSize = 13.sp)
+                        }
+                    }
+                }
                 Text(
                     text = subtitle,
                     color = if (isActive || isUnlocked) {
@@ -316,7 +355,7 @@ private fun PathStep(
 private fun masteryLabel(mastery: SpotMastery): String = when {
     mastery.isMastered -> "Maîtrisé · ${mastery.correctCount}/30 · ${mastery.successRatePercent} %"
     mastery.answerCount < MasteryCalculator.WINDOW_SIZE ->
-        "Progression : ${mastery.answerCount}/30 réponses · encore ${mastery.answersRemaining}"
+        "${mastery.answerCount}/30 réponses · ${mastery.answersRemaining} restantes"
     else ->
         "${mastery.correctCount}/30 correctes · ${mastery.successRatePercent} % · diversité " +
             "${mastery.distinctOpenHands}/8 Open, ${mastery.distinctFoldHands}/8 Fold"

@@ -1,63 +1,49 @@
 # Feuille de route
 
-Cette feuille de route décrit l'ordre de travail, pas des dates de livraison.
+Cette feuille de route décrit l'ordre de travail, sans date de livraison.
 
-## Étape 0 — Socle
+## Réalisé — Socle et ranges d'open
 
-- documentation initiale — réalisé ;
-- projet Android et build Gradle — réalisé ;
-- thème sombre et composants fondamentaux — réalisé ;
-- stockage DataStore de la progression et navigation — réalisé ;
-- format structuré et validation des ranges — réalisé pour Open BTN et CO.
+- application Android Kotlin/Compose et thème sombre ;
+- cinq ranges d'open 6-max : BTN, CO, HJ, UTG et SB ;
+- validation automatique des 169 catégories et des pourcentages sources ;
+- parcours progressif avec déblocages permanents ;
+- sessions guidées multi-spots de 20 questions ;
+- entraînement libre ciblé sur un spot débloqué ;
+- répétition espacée par couple spot-main ;
+- reprise des sessions guidées, XP et série quotidienne ;
+- stockage Room et DataStore avec migrations versionnées ;
+- table 6-max native et matrices de ranges reconstruites ;
+- consultation d'une range depuis l'accueil ou après une réponse ;
+- statistiques par spot, classements et matrice colorée par main ;
+- tests unitaires, Android Lint et essais sur émulateur et téléphone.
 
-## Étape 1 — Open BTN vertical
+## Prochaine étape — Stabilisation du MVP
 
-- transcription et validation de la range BTN — réalisé ;
-- session d'entraînement Open / Fold — réalisé sans persistance ;
-- feedback immédiat — réalisé ;
-- matrice `Voir la range` — réalisé ;
-- persistance de la session, XP et série — réalisé ;
-- historique détaillé des réponses avec Room — réalisé ;
-- maîtrise glissante et déblocage d'Open CO — réalisé ;
-- tests du domaine — réalisés ;
-- test du parcours sur émulateur ou appareil — à réaliser.
+1. recueillir et corriger les retours d'usage quotidien sur téléphone ;
+2. enrichir le résumé de fin de session : spots travaillés, erreurs et
+   révisions restantes ;
+3. ajouter des tests Compose sur les parcours critiques ;
+4. vérifier l'accessibilité et les tailles d'écran ;
+5. documenter les sauvegardes et migrations locales ;
+6. générer une APK release signée.
 
-Cette tranche doit fonctionner de bout en bout avant l'ajout d'un deuxième
-spot.
+## Module suivant — Défenses de grosse blinde
 
-## Étape 2 — Parcours des open ranges
+Après stabilisation des opens :
 
-- intégration de la range CO — réalisé ;
-- puis HJ, UTG et SB ;
-- déblocage pédagogique — réalisé pour BTN vers CO ;
-- maîtrise sur les 30 dernières réponses — réalisé ;
-- couverture et diversité — réalisé pour Open/Fold ;
-- progression par spot.
-- statistiques comparatives BTN/CO — première version réalisée.
+1. Défense BB vs BTN ;
+2. Défense BB vs CO ;
+3. Défense BB vs SB.
 
-## Étape 3 — Boucle quotidienne
+Ce module introduira les actions `Call`, `3-bet` et `Fold`. Il devra réutiliser
+le moteur de session, de répétition et de statistiques sans ajouter de logique
+spécifique aux opens dans les composants communs.
 
-- répétition espacée — première version réalisée ;
-- sessions guidées de 20 questions — réalisé ;
-- entraînement libre ciblé — réalisé pour BTN ;
-- XP, statistiques et série quotidienne ;
-- reprise d'une session interrompue.
+## Après les défenses de BB
 
-## Étape 4 — Stabilisation MVP
-
-- tests sur appareils Android ciblés ;
-- accessibilité et finitions ;
-- optimisation des performances ;
-- sauvegarde et migration des données locales ;
-- génération d'un APK signé ;
-- documentation d'installation.
-
-## Après le MVP
-
-Dans l'ordre prévu :
-
-1. défenses de BB ;
-2. 3-bets ;
+1. 3-bet SB vs BTN ;
+2. 3-bet BB vs BTN ;
 3. défense contre 3-bet ;
 4. récapitulatif préflop ;
-5. autres fondations du poker.
+5. autres fondations postflop.

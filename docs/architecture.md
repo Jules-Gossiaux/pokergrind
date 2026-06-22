@@ -6,7 +6,28 @@ L'architecture doit rendre le MVP simple sans enfermer les futurs chapitres
 dans un seul bloc. Le domaine poker et l'algorithme d'apprentissage ne doivent
 pas dépendre de l'interface Android ou du stockage.
 
-## 2. Structure cible
+## 2. Structure actuelle
+
+Le MVP reste dans un seul module Gradle `app`. Les frontières sont portées par
+des packages :
+
+```text
+com.pokergrind.app
+├── data
+│   └── local
+├── domain
+│   ├── model
+│   ├── statistics
+│   └── training
+└── ui
+    ├── home
+    ├── range
+    ├── statistics
+    ├── theme
+    └── training
+```
+
+## 3. Structure cible à long terme
 
 ```text
 app
@@ -29,7 +50,7 @@ Au démarrage, ces frontières peuvent être des packages ou quelques modules
 Gradle seulement. Un module séparé n'est créé que lorsqu'il apporte une vraie
 isolation ; la modularité ne doit pas ralentir le MVP.
 
-## 3. Couches
+## 4. Couches
 
 ### Présentation
 
@@ -56,7 +77,7 @@ Repositories et sources locales :
 - base Room pour les réponses et révisions ;
 - DataStore pour les préférences légères.
 
-## 4. Flux d'une réponse
+## 5. Flux d'une réponse
 
 ```text
 Sélecteur de révision
@@ -76,7 +97,7 @@ L'écriture locale est la source de vérité. L'état visible est dérivé de fl
 observables, afin de survivre aux changements de configuration et aux
 redémarrages.
 
-## 5. Chapitres futurs
+## 6. Chapitres futurs
 
 Un chapitre pédagogique expose à terme :
 
@@ -91,7 +112,7 @@ Le moteur de révision, les sessions, l'XP et les statistiques restent communs.
 Un nouveau chapitre ne doit pas modifier le fonctionnement interne des
 chapitres existants.
 
-## 6. Dépendances
+## 7. Dépendances
 
 Les dépendances vont vers le domaine :
 
@@ -105,7 +126,7 @@ Le catalogue préflop peut être remplacé dans les tests par une version rédui
 L'horloge et le générateur aléatoire sont injectables pour rendre les tests
 déterministes.
 
-## 7. Tests attendus
+## 8. Tests attendus
 
 - tests exhaustifs des 169 catégories de mains par range ;
 - tests des seuils de maîtrise et de leur réversibilité ;

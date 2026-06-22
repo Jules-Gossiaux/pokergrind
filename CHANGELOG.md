@@ -63,3 +63,7 @@ encore de version publiée.
 - passage direct du mode libre à une nouvelle session guidée ;
 - défilement du sélecteur de spots avec bouton Retour toujours accessible ;
 - boutons Voir la range et Continuer alignés à taille identique.
+- consultation des ranges débloquées directement depuis le parcours d'accueil ;
+- matrice de maîtrise colorée en vert, orange ou rouge selon le taux par main ;
+- documentation produit, technique, installation et feuille de route
+  réalignées sur la version 0.7.0.

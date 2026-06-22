@@ -23,6 +23,7 @@ Palette proposée pour le thème sombre prioritaire :
 | Action principale | vert doux | `#78BE7B` |
 | Succès | vert | `#65B66A` |
 | Erreur | corail doux | `#E47467` |
+| Maîtrise intermédiaire | orange doux | `#E6A45D` |
 | Progression / XP | pêche | `#EDB87A` |
 | Accent range | bleu clair | `#79B9EB` |
 
@@ -50,6 +51,11 @@ Hiérarchie proposée :
 
 La matrice de range est reconstruite en Compose à partir des 169 entrées. Elle
 doit rester lisible en plein écran et permettre d'identifier la main courante.
+
+Depuis l'accueil, chaque spot débloqué expose une action compacte `Voir` dans
+sa carte. Les spots verrouillés ne révèlent pas leur range. Dans les
+statistiques, la hauteur colorée indique le pourcentage de réussite et le
+couple couleur + légende indique le niveau de maîtrise.
 
 ## 5. Accessibilité
 

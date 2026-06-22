@@ -9,7 +9,8 @@ Le moteur doit maximiser l'apprentissage dans une session courte :
 - les mains jamais vues et les zones insuffisamment couvertes restent visibles ;
 - la sélection conserve de la diversité.
 
-L'algorithme précis sera validé par des tests de simulation avant d'être figé.
+L'algorithme actuel est volontairement simple et reste calibrable à partir de
+l'usage réel.
 
 ## 2. Unité de révision
 
@@ -73,8 +74,8 @@ de présenter deux fois de suite la même main, sauf absence d'alternative.
 
 ## 6. Entraînement libre
 
-L'entraînement libre réutilise les mêmes états d'apprentissage, mais sans
-budget quotidien. Il favorise le spot choisi et mélange :
+L'entraînement libre propose un bloc équilibré de 20 questions sur le spot
+choisi. Il mélange :
 
 - erreurs récentes ;
 - mains fragiles ;
@@ -92,13 +93,12 @@ La fenêtre de maîtrise contient les 30 dernières réponses du spot. Elle exig
 Les seuils exacts de couverture seront déterminés après import des ranges. Une
 action rare ne doit pas exiger plus de catégories qu'elle n'en contient.
 
-## 8. Paramètres encore à calibrer
-
-Avant implémentation définitive :
+## 8. Paramètres à calibrer avec l'usage
 
 - pondération entre retard, fragilité et couverture ;
-- seuils de couverture ;
-- comportement lorsqu'un spot perd sa maîtrise.
+- intervalles au-delà de 14 jours ;
+- seuil de fiabilité des statistiques par main.
 
-Ces constantes seront centralisées, nommées et testées. Elles ne seront pas
-disséminées dans l'interface.
+Les seuils de maîtrise actuels sont centralisés et testés. Un spot qui perd sa
+maîtrise reste accessible et redevient prioritaire, sans reverrouiller les
+spots déjà débloqués.

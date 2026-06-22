@@ -15,9 +15,16 @@ certification.
   réussite historique de la main ;
 - volume séparé d'entraînement libre.
 
-Une case grise indique qu'aucune réponse guidée n'existe encore. Une case
-partiellement verte représente directement le pourcentage de réussite : une
-main à 50 % remplit la moitié de sa case.
+Une case grise indique qu'aucune réponse guidée n'existe encore. Le remplissage
+représente directement le pourcentage de réussite historique de la main. Sa
+couleur facilite la lecture :
+
+- vert : 90 à 100 % ;
+- orange : 80 à 89 % ;
+- rouge : moins de 80 % ;
+- gris : aucune réponse guidée.
+
+La couleur complète le pourcentage et ne remplace pas l'information chiffrée.
 
 Une main doit avoir au moins deux réponses guidées avant d'entrer dans les
 classements forts/faibles. Ce seuil volontairement bas sera relevé lorsque
