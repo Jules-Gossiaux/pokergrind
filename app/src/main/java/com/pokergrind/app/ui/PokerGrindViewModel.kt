@@ -31,13 +31,19 @@ data class PokerGrindUiState(
     val isLoading: Boolean = true,
     val xp: Int = 0,
     val streak: Int = 0,
-    val session: StoredTrainingSession? = null,
+    val guidedSession: StoredTrainingSession? = null,
+    val freeSession: StoredTrainingSession? = null,
     val masteryBySpot: Map<String, SpotMastery> = emptyMap(),
     val unlockedSpotIds: Set<String> = emptySet(),
     val statistics: StatisticsSnapshot = StatisticsSnapshot(),
 ) {
     val btnMastery: SpotMastery
         get() = masteryBySpot[BtnOpenRange.definition.id] ?: MasteryCalculator.empty
+
+    fun sessionFor(mode: TrainingMode): StoredTrainingSession? = when (mode) {
+        TrainingMode.GUIDED -> guidedSession
+        TrainingMode.FREE -> freeSession
+    }
 }
 
 class PokerGrindViewModel(application: Application) : AndroidViewModel(application) {
@@ -92,7 +98,7 @@ class PokerGrindViewModel(application: Application) : AndroidViewModel(applicati
     }
 
     fun startGuidedSession() {
-        if (uiState.value.session?.takeUnless { it.isComplete }?.mode == TrainingMode.GUIDED) return
+        if (uiState.value.guidedSession?.isComplete == false) return
         viewModelScope.launch {
             val availableRanges = ranges.filter { it.id in uiState.value.unlockedSpotIds }
                 .ifEmpty { listOf(btnRange) }
@@ -109,7 +115,7 @@ class PokerGrindViewModel(application: Application) : AndroidViewModel(applicati
     }
 
     fun startFreeSession(spotId: String) {
-        if (uiState.value.session?.takeUnless { it.isComplete }?.mode == TrainingMode.FREE) return
+        if (uiState.value.freeSession?.isComplete == false) return
         val range = rangesById[spotId] ?: return
         if (spotId !in uiState.value.unlockedSpotIds) return
         viewModelScope.launch {
@@ -122,8 +128,8 @@ class PokerGrindViewModel(application: Application) : AndroidViewModel(applicati
         }
     }
 
-    fun answer(action: PokerAction, responseTimeMillis: Long) {
-        val session = uiState.value.session ?: return
+    fun answer(mode: TrainingMode, action: PokerAction, responseTimeMillis: Long) {
+        val session = uiState.value.sessionFor(mode) ?: return
         if (session.selectedAction != null || session.isComplete) return
         val question = session.currentQuestion ?: return
         val range = rangesById[question.spotId] ?: return
@@ -143,26 +149,14 @@ class PokerGrindViewModel(application: Application) : AndroidViewModel(applicati
         }
     }
 
-    fun moveToNextQuestion() {
-        val session = uiState.value.session ?: return
+    fun moveToNextQuestion(mode: TrainingMode) {
+        val session = uiState.value.sessionFor(mode) ?: return
         if (session.selectedAction == null || session.isComplete) return
-        viewModelScope.launch { progressStore.moveToNextQuestion() }
+        viewModelScope.launch { progressStore.moveToNextQuestion(mode) }
     }
 
-    fun leaveTraining(onComplete: () -> Unit) {
-        val activeSession = uiState.value.session?.takeUnless { it.isComplete }
-        if (activeSession == null || activeSession.mode == TrainingMode.GUIDED) {
-            onComplete()
-            return
-        }
-        viewModelScope.launch {
-            progressStore.discardSession()
-            onComplete()
-        }
-    }
-
-    fun rangeForCurrentQuestion(): RangeDefinition {
-        val spotId = uiState.value.session?.currentQuestion?.spotId
+    fun rangeForCurrentQuestion(mode: TrainingMode): RangeDefinition {
+        val spotId = uiState.value.sessionFor(mode)?.currentQuestion?.spotId
         return rangesById[spotId] ?: btnRange
     }
 
@@ -174,7 +168,8 @@ class PokerGrindViewModel(application: Application) : AndroidViewModel(applicati
         isLoading = false,
         xp = xp,
         streak = streak,
-        session = session,
+        guidedSession = guidedSession,
+        freeSession = freeSession,
         masteryBySpot = masteryBySpot,
         unlockedSpotIds = unlockedSpotIds,
         statistics = statistics,

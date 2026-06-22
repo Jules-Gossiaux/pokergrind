@@ -64,7 +64,7 @@ object GuidedSessionPlanner {
     }
 
     private fun priority(review: ReviewState?, nowEpochMillis: Long): Long {
-        if (review == null) return 2_000_000_000L
+        if (review == null) return 500_000_000L
         val overdueMillis = (nowEpochMillis - review.dueAtEpochMillis).coerceAtLeast(0)
         val dueScore = if (review.dueAtEpochMillis <= nowEpochMillis) 1_000_000_000L else 0
         return review.priorityBoost * 10_000_000_000L +

@@ -39,6 +39,8 @@ Nouveau → Apprentissage → Révision
 - programme une réapparition environ trois questions plus tard dans une
   session guidée ;
 - augmente fortement sa priorité ;
+- chaque nouvelle erreur sur la même main augmente encore cette priorité,
+  jusqu'à un plafond de sécurité ;
 - raccourcit sa prochaine échéance.
 
 ### Bonne réponse
@@ -72,6 +74,12 @@ La session cible 20 questions. Le sélecteur remplit ce budget dans cet ordre :
 Les révisions dues qui dépassent le budget sont reportées. Le sélecteur évite
 de présenter deux fois de suite la même main, sauf absence d'alternative.
 
+Dans chaque groupe d'action, une révision arrivée à échéance passe avant une
+main jamais vue. Une erreur possède en plus un bonus de priorité nettement
+supérieur. L'équilibrage conserve toutefois dix décisions Open et dix Fold et
+un minimum par spot : si plus de 20 révisions sont prioritaires, le surplus est
+reporté à la session suivante.
+
 ## 6. Entraînement libre
 
 L'entraînement libre propose un bloc équilibré de 20 questions sur le spot
@@ -102,3 +110,19 @@ action rare ne doit pas exiger plus de catégories qu'elle n'en contient.
 Les seuils de maîtrise actuels sont centralisés et testés. Un spot qui perd sa
 maîtrise reste accessible et redevient prioritaire, sans reverrouiller les
 spots déjà débloqués.
+
+## 9. Différence avec Anki
+
+PokerGrind utilise une répétition espacée inspirée d'Anki, mais n'embarque ni
+SM-2 ni FSRS :
+
+- une première bonne réponse programme la main à 1 jour ;
+- les suivantes passent à 3, 7, 14 jours puis doublent l'intervalle ;
+- une erreur remet l'échéance à maintenant, réinitialise le palier et augmente
+  le nombre d'oublis et la priorité ;
+- une erreur guidée est aussi réinsérée environ trois questions plus tard ;
+- une erreur libre influence la prochaine session guidée ;
+- une bonne réponse libre ne modifie pas l'échéance.
+
+L'état est persisté dans la table Room `review_items` pour chaque couple
+`spot + main`. Il survit donc aux fermetures et aux mises à jour de l'APK.

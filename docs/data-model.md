@@ -105,7 +105,9 @@ L'état persistant actuel contient :
 - action sélectionnée sur la question courante.
 
 Une série quotidienne n'est mise à jour qu'à la fin d'une session quotidienne
-complète. Une session libre est supprimée lorsqu'elle est quittée.
+complète. DataStore conserve deux emplacements indépendants, un pour la session
+guidée et un pour la session libre. Les deux modes peuvent donc être suspendus
+et repris sans s'écraser.
 
 ### SpotProgress
 
@@ -136,10 +138,10 @@ meilleure série restent à définir.
 
 Le premier incrément utilise DataStore pour conserver :
 
-- l'ordre des 20 mains de la session ;
-- l'index de la question courante ;
-- le score de la session ;
-- l'action déjà choisie sur la question courante ;
+- l'ordre des 20 mains de chaque mode ;
+- l'index courant de chaque mode ;
+- le score de chaque mode ;
+- l'action déjà choisie sur la question courante de chaque mode ;
 - le total d'XP ;
 - la série et la date de dernière session terminée.
 

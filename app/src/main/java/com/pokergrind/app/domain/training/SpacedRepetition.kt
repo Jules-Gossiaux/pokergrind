@@ -26,7 +26,7 @@ object SpacedRepetition {
                 intervalDays = 0,
                 stage = 0,
                 lapses = state.lapses + 1,
-                priorityBoost = max(state.priorityBoost, 4),
+                priorityBoost = max(state.priorityBoost + 1, 4).coerceAtMost(MAX_PRIORITY_BOOST),
                 lastReviewedAtEpochMillis = nowEpochMillis,
             )
         }
@@ -56,8 +56,10 @@ object SpacedRepetition {
             intervalDays = 0,
             stage = 0,
             lapses = state.lapses + 1,
-            priorityBoost = max(state.priorityBoost + 2, 5),
+            priorityBoost = max(state.priorityBoost + 2, 5).coerceAtMost(MAX_PRIORITY_BOOST),
             lastReviewedAtEpochMillis = nowEpochMillis,
         )
     }
+
+    private const val MAX_PRIORITY_BOOST = 20
 }

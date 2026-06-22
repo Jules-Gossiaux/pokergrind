@@ -100,8 +100,10 @@ bloc guidé terminé entretient la série du jour.
 - une bonne réponse ne compte pas dans les 30 réponses de maîtrise ;
 - une erreur rend la main prioritaire dans les futures sessions guidées ;
 - il ne remplace pas la session guidée pour la série.
-- quitter une session libre l'abandonne ;
-- démarrer une session guidée remplace une éventuelle session libre en cours.
+- quitter une session libre la met en pause ;
+- une session guidée et une session libre peuvent rester en cours
+  simultanément ;
+- chaque mode reprend son index, son score et son feedback indépendamment.
 
 ## 7. Maîtrise d'un spot
 
@@ -153,8 +155,8 @@ Barème du premier incrément :
 - la série est validée une seule fois par jour, à la fin des 20 questions ;
 - une session guidée interrompue reprend à la question exacte, avec son score
   et son feedback conservés ;
-- une session libre est volontairement abandonnée lorsque l'utilisateur la
-  quitte.
+- une session libre interrompue reprend également à la question exacte ;
+- passer d'un mode à l'autre ne remplace plus la session en pause.
 
 L'écran Statistiques affiche une matrice par spot. Le remplissage représente le
 taux de réussite historique de la main et la couleur indique son niveau :

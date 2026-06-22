@@ -32,6 +32,7 @@ private enum class Destination {
 fun PokerGrindApp(viewModel: PokerGrindViewModel = viewModel()) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var destination by rememberSaveable { mutableStateOf(Destination.HOME) }
+    var trainingMode by rememberSaveable { mutableStateOf(TrainingMode.GUIDED) }
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -53,16 +54,18 @@ fun PokerGrindApp(viewModel: PokerGrindViewModel = viewModel()) {
                 ranges = viewModel.ranges,
                 xp = uiState.xp,
                 streak = uiState.streak,
-                activeSession = uiState.session?.takeUnless { it.isComplete },
+                guidedSession = uiState.guidedSession?.takeUnless { it.isComplete },
+                freeSession = uiState.freeSession?.takeUnless { it.isComplete },
                 masteryBySpot = uiState.masteryBySpot,
                 unlockedSpotIds = uiState.unlockedSpotIds,
                 onStartTraining = {
                     viewModel.startGuidedSession()
+                    trainingMode = TrainingMode.GUIDED
                     destination = Destination.TRAINING
                 },
                 onOpenFreeTraining = {
-                    val activeSession = uiState.session?.takeUnless { it.isComplete }
-                    destination = if (activeSession?.mode == TrainingMode.FREE) {
+                    destination = if (uiState.freeSession?.isComplete == false) {
+                        trainingMode = TrainingMode.FREE
                         Destination.TRAINING
                     } else {
                         Destination.FREE_SPOT
@@ -77,6 +80,7 @@ fun PokerGrindApp(viewModel: PokerGrindViewModel = viewModel()) {
                 freeAnswerCount = uiState.statistics.freeSpotStats.sumOf { it.answerCount },
                 onSelectSpot = { spotId ->
                     viewModel.startFreeSession(spotId)
+                    trainingMode = TrainingMode.FREE
                     destination = Destination.TRAINING
                 },
                 onBack = { destination = Destination.HOME },
@@ -91,25 +95,23 @@ fun PokerGrindApp(viewModel: PokerGrindViewModel = viewModel()) {
             )
 
             Destination.TRAINING -> TrainingScreen(
-                range = viewModel.rangeForCurrentQuestion(),
-                session = uiState.session,
-                onAnswer = viewModel::answer,
-                onNext = viewModel::moveToNextQuestion,
+                range = viewModel.rangeForCurrentQuestion(trainingMode),
+                session = uiState.sessionFor(trainingMode),
+                onAnswer = { action, responseTime ->
+                    viewModel.answer(trainingMode, action, responseTime)
+                },
+                onNext = { viewModel.moveToNextQuestion(trainingMode) },
                 onRestart = {
-                    when (uiState.session?.mode) {
+                    when (trainingMode) {
                         TrainingMode.FREE -> {
-                            val spotId = uiState.session?.questions?.firstOrNull()?.spotId
+                            val spotId = uiState.freeSession?.questions?.firstOrNull()?.spotId
                                 ?: BtnOpenRange.definition.id
                             viewModel.startFreeSession(spotId)
                         }
                         else -> viewModel.startGuidedSession()
                     }
                 },
-                onBack = {
-                    viewModel.leaveTraining {
-                        destination = Destination.HOME
-                    }
-                },
+                onBack = { destination = Destination.HOME },
             )
         }
     }

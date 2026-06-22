@@ -80,6 +80,7 @@ class AnswerRepository(
 
         if (insertedId != -1L) {
             progressStore.answer(
+                mode = session.mode,
                 action = chosenAction,
                 isCorrect = isCorrect,
             )
@@ -92,7 +93,8 @@ class AnswerRepository(
             )
             if (session.mode == TrainingMode.GUIDED && !isCorrect) {
                 progressStore.scheduleRetry(
-                    StoredQuestion(spotId = spotId, handNotation = handNotation),
+                    mode = session.mode,
+                    question = StoredQuestion(spotId = spotId, handNotation = handNotation),
                 )
             }
         }

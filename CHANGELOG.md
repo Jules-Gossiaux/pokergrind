@@ -70,3 +70,12 @@ encore de version publiée.
 - légende de maîtrise remplacée par des pastilles colorées compactes ;
 - script PowerShell de compilation, mise à jour et lancement sur téléphone
   physique sans perte de progression.
+- sessions guidée et libre persistées indépendamment et reprises à leur
+  question exacte sans s'écraser ;
+- migration transparente des anciennes sessions DataStore vers la lecture
+  multi-mode ;
+- priorité des révisions dues placée avant les mains nouvelles ;
+- augmentation progressive de la priorité après plusieurs erreurs sur une même
+  main ;
+- audit et documentation de l'algorithme de répétition espacée, avec sa
+  différence explicite par rapport à Anki/FSRS.

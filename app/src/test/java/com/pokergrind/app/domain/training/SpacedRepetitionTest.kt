@@ -37,6 +37,18 @@ class SpacedRepetitionTest {
     }
 
     @Test
+    fun `repeated guided errors progressively increase priority`() {
+        val first = SpacedRepetition.afterGuidedAnswer(null, false, now)
+        val second = SpacedRepetition.afterGuidedAnswer(first, false, now + 1)
+        val third = SpacedRepetition.afterGuidedAnswer(second, false, now + 2)
+
+        assertEquals(4, first.priorityBoost)
+        assertEquals(5, second.priorityBoost)
+        assertEquals(6, third.priorityBoost)
+        assertEquals(3, third.lapses)
+    }
+
+    @Test
     fun `free error boosts guided priority`() {
         val state = SpacedRepetition.afterFreeError(null, now)
 

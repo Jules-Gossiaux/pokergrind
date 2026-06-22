@@ -42,7 +42,8 @@ data class StoredProgress(
     val xp: Int = 0,
     val streak: Int = 0,
     val lastCompletedDate: LocalDate? = null,
-    val session: StoredTrainingSession? = null,
+    val guidedSession: StoredTrainingSession? = null,
+    val freeSession: StoredTrainingSession? = null,
 )
 
 class ProgressStore(private val context: Context) {
@@ -58,62 +59,62 @@ class ProgressStore(private val context: Context) {
         questions: List<StoredQuestion>,
     ) {
         context.progressDataStore.edit { preferences ->
-            preferences[SESSION_ID] = UUID.randomUUID().toString()
-            preferences[SESSION_MODE] = mode.name
-            preferences[SESSION_QUESTIONS] = encodeQuestions(questions)
-            preferences[SESSION_INDEX] = 0
-            preferences[SESSION_CORRECT] = 0
-            preferences.remove(SESSION_SELECTED_ACTION)
+            val keys = keysFor(mode)
+            preferences[keys.id] = UUID.randomUUID().toString()
+            preferences[keys.questions] = encodeQuestions(questions)
+            preferences[keys.index] = 0
+            preferences[keys.correct] = 0
+            preferences.remove(keys.selectedAction)
         }
     }
 
-    suspend fun discardSession() {
+    suspend fun discardSession(mode: TrainingMode) {
         context.progressDataStore.edit { preferences ->
-            preferences.remove(SESSION_ID)
-            preferences.remove(SESSION_MODE)
-            preferences.remove(SESSION_QUESTIONS)
-            preferences.remove(LEGACY_SESSION_HANDS)
-            preferences.remove(SESSION_INDEX)
-            preferences.remove(SESSION_CORRECT)
-            preferences.remove(SESSION_SELECTED_ACTION)
+            val keys = keysFor(mode)
+            preferences.remove(keys.id)
+            preferences.remove(keys.questions)
+            preferences.remove(keys.index)
+            preferences.remove(keys.correct)
+            preferences.remove(keys.selectedAction)
+            if (legacyMode(preferences) == mode) clearLegacySession(preferences)
         }
     }
 
-    suspend fun answer(action: PokerAction, isCorrect: Boolean) {
+    suspend fun answer(mode: TrainingMode, action: PokerAction, isCorrect: Boolean) {
         context.progressDataStore.edit { preferences ->
-            if (preferences[SESSION_SELECTED_ACTION] != null) return@edit
-            preferences[SESSION_SELECTED_ACTION] = action.name
+            val keys = activeKeys(preferences, mode)
+            if (preferences[keys.selectedAction] != null) return@edit
+            preferences[keys.selectedAction] = action.name
             if (isCorrect) {
-                preferences[SESSION_CORRECT] = (preferences[SESSION_CORRECT] ?: 0) + 1
+                preferences[keys.correct] = (preferences[keys.correct] ?: 0) + 1
                 preferences[XP] = (preferences[XP] ?: 0) + XP_PER_CORRECT_ANSWER
             }
         }
     }
 
-    suspend fun moveToNextQuestion() {
+    suspend fun moveToNextQuestion(mode: TrainingMode) {
         context.progressDataStore.edit { preferences ->
+            val keys = activeKeys(preferences, mode)
             val questions = decodeQuestions(
-                preferences[SESSION_QUESTIONS] ?: preferences[LEGACY_SESSION_HANDS],
+                preferences[keys.questions],
             )
-            val nextIndex = (preferences[SESSION_INDEX] ?: 0) + 1
-            preferences[SESSION_INDEX] = nextIndex
-            preferences.remove(SESSION_SELECTED_ACTION)
+            val nextIndex = (preferences[keys.index] ?: 0) + 1
+            preferences[keys.index] = nextIndex
+            preferences.remove(keys.selectedAction)
 
-            val mode = preferences[SESSION_MODE]
-                ?.let { runCatching { TrainingMode.valueOf(it) }.getOrNull() }
-                ?: TrainingMode.GUIDED
             if (mode == TrainingMode.GUIDED && questions.isNotEmpty() && nextIndex >= questions.size) {
                 updateStreak(preferences, LocalDate.now())
             }
         }
     }
 
-    suspend fun scheduleRetry(question: StoredQuestion) {
+    suspend fun scheduleRetry(mode: TrainingMode, question: StoredQuestion) {
         context.progressDataStore.edit { preferences ->
+            val keys = activeKeys(preferences, mode)
             val questions = decodeQuestions(
-                preferences[SESSION_QUESTIONS] ?: preferences[LEGACY_SESSION_HANDS],
+                preferences[keys.questions],
             ).toMutableList()
-            val currentIndex = preferences[SESSION_INDEX] ?: 0
+            val currentIndex = preferences[keys.index] ?: 0
             if (questions.isEmpty() || currentIndex >= questions.lastIndex) return@edit
 
             val insertionIndex = (currentIndex + RETRY_GAP + 1).coerceAtMost(questions.lastIndex)
@@ -124,28 +125,11 @@ class ProgressStore(private val context: Context) {
 
             questions.add(insertionIndex, question)
             if (questions.size > SESSION_SIZE) questions.removeAt(questions.lastIndex)
-            preferences[SESSION_QUESTIONS] = encodeQuestions(questions)
+            preferences[keys.questions] = encodeQuestions(questions)
         }
     }
 
     private fun toStoredProgress(preferences: Preferences): StoredProgress {
-        val questions = decodeQuestions(
-            preferences[SESSION_QUESTIONS] ?: preferences[LEGACY_SESSION_HANDS],
-        )
-        val session = questions.takeIf { it.isNotEmpty() }?.let {
-            StoredTrainingSession(
-                id = preferences[SESSION_ID] ?: "legacy-session",
-                mode = preferences[SESSION_MODE]
-                    ?.let { value -> runCatching { TrainingMode.valueOf(value) }.getOrNull() }
-                    ?: TrainingMode.GUIDED,
-                questions = it,
-                questionIndex = preferences[SESSION_INDEX] ?: 0,
-                correctCount = preferences[SESSION_CORRECT] ?: 0,
-                selectedAction = preferences[SESSION_SELECTED_ACTION]
-                    ?.let { runCatching { PokerAction.valueOf(it) }.getOrNull() },
-            )
-        }
-
         return StoredProgress(
             xp = preferences[XP] ?: 0,
             streak = ProgressionRules.visibleStreak(
@@ -154,8 +138,57 @@ class ProgressStore(private val context: Context) {
                 today = LocalDate.now(),
             ),
             lastCompletedDate = preferences[LAST_COMPLETED_DATE]?.let(LocalDate::parse),
-            session = session,
+            guidedSession = sessionFor(preferences, TrainingMode.GUIDED),
+            freeSession = sessionFor(preferences, TrainingMode.FREE),
         )
+    }
+
+    private fun sessionFor(
+        preferences: Preferences,
+        mode: TrainingMode,
+    ): StoredTrainingSession? {
+        val dedicatedKeys = keysFor(mode)
+        val keys = when {
+            preferences[dedicatedKeys.questions] != null -> dedicatedKeys
+            legacyMode(preferences) == mode -> LEGACY_KEYS
+            else -> return null
+        }
+        val questions = decodeQuestions(preferences[keys.questions])
+        return questions.takeIf { it.isNotEmpty() }?.let {
+            StoredTrainingSession(
+                id = preferences[keys.id] ?: "legacy-${mode.name.lowercase()}-session",
+                mode = mode,
+                questions = it,
+                questionIndex = preferences[keys.index] ?: 0,
+                correctCount = preferences[keys.correct] ?: 0,
+                selectedAction = preferences[keys.selectedAction]
+                    ?.let { runCatching { PokerAction.valueOf(it) }.getOrNull() },
+            )
+        }
+    }
+
+    private fun activeKeys(preferences: Preferences, mode: TrainingMode): SessionKeys {
+        val dedicated = keysFor(mode)
+        return if (preferences[dedicated.questions] != null) dedicated else LEGACY_KEYS
+    }
+
+    private fun legacyMode(preferences: Preferences): TrainingMode? =
+        preferences[SESSION_MODE]
+            ?.let { runCatching { TrainingMode.valueOf(it) }.getOrNull() }
+            ?: if (preferences[LEGACY_SESSION_HANDS] != null || preferences[SESSION_QUESTIONS] != null) {
+                TrainingMode.GUIDED
+            } else {
+                null
+            }
+
+    private fun clearLegacySession(preferences: androidx.datastore.preferences.core.MutablePreferences) {
+        preferences.remove(SESSION_ID)
+        preferences.remove(SESSION_MODE)
+        preferences.remove(SESSION_QUESTIONS)
+        preferences.remove(LEGACY_SESSION_HANDS)
+        preferences.remove(SESSION_INDEX)
+        preferences.remove(SESSION_CORRECT)
+        preferences.remove(SESSION_SELECTED_ACTION)
     }
 
     private fun updateStreak(preferences: androidx.datastore.preferences.core.MutablePreferences, today: LocalDate) {
@@ -203,5 +236,54 @@ class ProgressStore(private val context: Context) {
         private val SESSION_INDEX = intPreferencesKey("session_index")
         private val SESSION_CORRECT = intPreferencesKey("session_correct")
         private val SESSION_SELECTED_ACTION = stringPreferencesKey("session_selected_action")
+
+        private val GUIDED_SESSION_ID = stringPreferencesKey("guided_session_id")
+        private val GUIDED_SESSION_QUESTIONS = stringPreferencesKey("guided_session_questions")
+        private val GUIDED_SESSION_INDEX = intPreferencesKey("guided_session_index")
+        private val GUIDED_SESSION_CORRECT = intPreferencesKey("guided_session_correct")
+        private val GUIDED_SESSION_SELECTED_ACTION = stringPreferencesKey("guided_session_selected_action")
+
+        private val FREE_SESSION_ID = stringPreferencesKey("free_session_id")
+        private val FREE_SESSION_QUESTIONS = stringPreferencesKey("free_session_questions")
+        private val FREE_SESSION_INDEX = intPreferencesKey("free_session_index")
+        private val FREE_SESSION_CORRECT = intPreferencesKey("free_session_correct")
+        private val FREE_SESSION_SELECTED_ACTION = stringPreferencesKey("free_session_selected_action")
+
+        private val LEGACY_KEYS = SessionKeys(
+            id = SESSION_ID,
+            questions = SESSION_QUESTIONS,
+            index = SESSION_INDEX,
+            correct = SESSION_CORRECT,
+            selectedAction = SESSION_SELECTED_ACTION,
+        )
+
+        private val GUIDED_KEYS = SessionKeys(
+            id = GUIDED_SESSION_ID,
+            questions = GUIDED_SESSION_QUESTIONS,
+            index = GUIDED_SESSION_INDEX,
+            correct = GUIDED_SESSION_CORRECT,
+            selectedAction = GUIDED_SESSION_SELECTED_ACTION,
+        )
+
+        private val FREE_KEYS = SessionKeys(
+            id = FREE_SESSION_ID,
+            questions = FREE_SESSION_QUESTIONS,
+            index = FREE_SESSION_INDEX,
+            correct = FREE_SESSION_CORRECT,
+            selectedAction = FREE_SESSION_SELECTED_ACTION,
+        )
+
+        private fun keysFor(mode: TrainingMode): SessionKeys = when (mode) {
+            TrainingMode.GUIDED -> GUIDED_KEYS
+            TrainingMode.FREE -> FREE_KEYS
+        }
     }
 }
+
+private data class SessionKeys(
+    val id: Preferences.Key<String>,
+    val questions: Preferences.Key<String>,
+    val index: Preferences.Key<Int>,
+    val correct: Preferences.Key<Int>,
+    val selectedAction: Preferences.Key<String>,
+)

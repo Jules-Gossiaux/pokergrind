@@ -31,6 +31,27 @@ class GuidedSessionPlannerTest {
     }
 
     @Test
+    fun `due review is selected before unseen hands`() {
+        val range = BtnOpenRange.definition
+        val dueHand = "72o"
+        val reviewStates = mapOf(
+            (range.id to dueHand) to ReviewState(
+                dueAtEpochMillis = 9_000,
+                stage = 1,
+            ),
+        )
+
+        val session = GuidedSessionPlanner.plan(
+            ranges = listOf(range),
+            reviewStates = reviewStates,
+            nowEpochMillis = 10_000,
+            random = Random(42),
+        )
+
+        assertTrue(session.any { (_, hand) -> hand.notation == dueHand })
+    }
+
+    @Test
     fun `every unlocked range is represented in a guided session`() {
         val btn = BtnOpenRange.definition
         val co = CoOpenRange.definition

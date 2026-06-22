@@ -38,7 +38,6 @@ import com.pokergrind.app.data.local.StoredTrainingSession
 import com.pokergrind.app.domain.model.RangeDefinition
 import com.pokergrind.app.domain.training.MasteryCalculator
 import com.pokergrind.app.domain.training.SpotMastery
-import com.pokergrind.app.domain.training.TrainingMode
 import com.pokergrind.app.ui.range.RangeDialog
 import com.pokergrind.app.ui.theme.Progress
 import com.pokergrind.app.ui.theme.SurfaceElevated
@@ -50,7 +49,8 @@ fun HomeScreen(
     ranges: List<RangeDefinition>,
     xp: Int,
     streak: Int,
-    activeSession: StoredTrainingSession?,
+    guidedSession: StoredTrainingSession?,
+    freeSession: StoredTrainingSession?,
     masteryBySpot: Map<String, SpotMastery>,
     unlockedSpotIds: Set<String>,
     onStartTraining: () -> Unit,
@@ -146,13 +146,15 @@ fun HomeScreen(
             ranges.forEachIndexed { index, range ->
                 val unlocked = range.id in unlockedSpotIds
                 val mastery = masteryBySpot[range.id] ?: MasteryCalculator.empty
-                val sessionTouchesRange = activeSession?.currentQuestion?.spotId == range.id
+                val guidedTouchesRange = guidedSession?.currentQuestion?.spotId == range.id
+                val freeTouchesRange = freeSession?.currentQuestion?.spotId == range.id
                 PathStep(
                     number = index + 1,
                     title = range.title,
-                    subtitle = if (sessionTouchesRange) {
-                        val label = if (activeSession?.mode == TrainingMode.GUIDED) "Guidé" else "Libre"
-                        "$label en cours · ${(activeSession?.questionIndex?.plus(1) ?: 1)}/20"
+                    subtitle = if (guidedTouchesRange) {
+                        "Guidé en cours · ${(guidedSession?.questionIndex?.plus(1) ?: 1)}/20"
+                    } else if (freeTouchesRange) {
+                        "Libre en cours · ${(freeSession?.questionIndex?.plus(1) ?: 1)}/20"
                     } else if (unlocked) {
                         "${range.stackDepthBb} BB · Open 2,5 BB"
                     } else {
@@ -187,10 +189,8 @@ fun HomeScreen(
                 ),
             ) {
                 Text(
-                    if (activeSession?.mode == TrainingMode.GUIDED) {
-                        "Reprendre le guidé · ${activeSession.questionIndex + 1}/20"
-                    } else if (activeSession?.mode == TrainingMode.FREE) {
-                        "Passer à la session guidée"
+                    if (guidedSession != null) {
+                        "Reprendre le guidé · ${guidedSession.questionIndex + 1}/20"
                     } else {
                         "Session guidée · 20 questions"
                     },
@@ -205,7 +205,13 @@ fun HomeScreen(
                         .height(48.dp),
                     shape = RoundedCornerShape(16.dp),
                 ) {
-                    Text(if (activeSession?.mode == TrainingMode.FREE) "Reprendre libre" else "Mode libre")
+                    Text(
+                        if (freeSession != null) {
+                            "Reprendre libre"
+                        } else {
+                            "Mode libre"
+                        },
+                    )
                 }
                 OutlinedButton(
                     onClick = onOpenStatistics,
