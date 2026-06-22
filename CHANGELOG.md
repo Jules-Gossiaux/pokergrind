@@ -79,3 +79,6 @@ encore de version publiée.
   main ;
 - audit et documentation de l'algorithme de répétition espacée, avec sa
   différence explicite par rapport à Anki/FSRS.
+- détail minimal et replié des prochaines révisions dans Statistiques ;
+- nombre de révisions dues visible sans exposer les paramètres techniques du
+  moteur.

@@ -43,6 +43,7 @@ import com.pokergrind.app.domain.model.RangeDefinition
 import com.pokergrind.app.domain.statistics.HandStatistics
 import com.pokergrind.app.domain.statistics.StatisticsSnapshot
 import com.pokergrind.app.domain.training.SpotMastery
+import com.pokergrind.app.domain.training.ReviewState
 import com.pokergrind.app.ui.theme.Error
 import com.pokergrind.app.ui.theme.MasteryMedium
 import com.pokergrind.app.ui.theme.RangeFold
@@ -50,12 +51,14 @@ import com.pokergrind.app.ui.theme.Success
 import com.pokergrind.app.ui.theme.SurfaceElevated
 import com.pokergrind.app.ui.theme.TextSecondary
 import java.util.Locale
+import kotlin.math.ceil
 
 @Composable
 fun StatisticsScreen(
     ranges: List<RangeDefinition>,
     statistics: StatisticsSnapshot,
     masteryBySpot: Map<String, SpotMastery>,
+    reviewStates: Map<Pair<String, String>, ReviewState>,
     unlockedSpotIds: Set<String>,
     onBack: () -> Unit,
 ) {
@@ -63,6 +66,7 @@ fun StatisticsScreen(
     var selectedSpotId by rememberSaveable {
         mutableStateOf(knownRanges.firstOrNull()?.id.orEmpty())
     }
+    var showReviewDetails by rememberSaveable { mutableStateOf(false) }
     val selectedRange = knownRanges.firstOrNull { it.id == selectedSpotId }
         ?: knownRanges.firstOrNull()
     val reliableHands = statistics.guidedHandStats.filter { it.answerCount >= 2 }
@@ -121,6 +125,13 @@ fun StatisticsScreen(
                         .filter { it.spotId == range.id }
                         .associateBy(HandStatistics::handNotation),
                 )
+                Spacer(Modifier.height(18.dp))
+                ReviewDetails(
+                    range = range,
+                    reviewStates = reviewStates,
+                    expanded = showReviewDetails,
+                    onToggle = { showReviewDetails = !showReviewDetails },
+                )
             }
 
             Spacer(Modifier.height(24.dp))
@@ -169,6 +180,109 @@ fun StatisticsScreen(
         }
     }
 }
+
+@Composable
+private fun ReviewDetails(
+    range: RangeDefinition,
+    reviewStates: Map<Pair<String, String>, ReviewState>,
+    expanded: Boolean,
+    onToggle: () -> Unit,
+) {
+    val now = System.currentTimeMillis()
+    val items = range.entries
+        .mapNotNull { entry ->
+            reviewStates[range.id to entry.hand.notation]?.let { state ->
+                entry.hand.notation to state
+            }
+        }
+        .sortedWith(
+            compareBy<Pair<String, ReviewState>> { it.second.dueAtEpochMillis }
+                .thenByDescending { it.second.priorityBoost },
+        )
+    val dueCount = items.count { it.second.dueAtEpochMillis <= now }
+
+    OutlinedButton(
+        onClick = onToggle,
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(48.dp),
+        shape = RoundedCornerShape(16.dp),
+    ) {
+        Text(
+            if (expanded) {
+                "Masquer les révisions"
+            } else {
+                "Prochaines révisions${if (dueCount > 0) " · $dueCount dues" else ""}"
+            },
+        )
+    }
+
+    if (!expanded) return
+
+    Spacer(Modifier.height(10.dp))
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = SurfaceElevated),
+        shape = RoundedCornerShape(18.dp),
+    ) {
+        Column(Modifier.padding(horizontal = 16.dp, vertical = 12.dp)) {
+            if (items.isEmpty()) {
+                Text("Aucune révision planifiée.", color = TextSecondary)
+            } else {
+                items.take(MAX_VISIBLE_REVIEWS).forEachIndexed { index, (hand, state) ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 7.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Text(hand, fontWeight = FontWeight.Bold)
+                        Text(
+                            reviewLabel(state, now),
+                            color = if (state.dueAtEpochMillis <= now) Error else TextSecondary,
+                            fontSize = 13.sp,
+                        )
+                    }
+                    if (index < minOf(items.lastIndex, MAX_VISIBLE_REVIEWS - 1)) {
+                        Box(
+                            Modifier
+                                .fillMaxWidth()
+                                .height(1.dp)
+                                .background(RangeFold),
+                        )
+                    }
+                }
+                if (items.size > MAX_VISIBLE_REVIEWS) {
+                    Spacer(Modifier.height(6.dp))
+                    Text(
+                        "+ ${items.size - MAX_VISIBLE_REVIEWS} autres mains planifiées",
+                        color = TextSecondary,
+                        fontSize = 12.sp,
+                    )
+                }
+            }
+        }
+    }
+}
+
+private fun reviewLabel(state: ReviewState, nowEpochMillis: Long): String {
+    if (state.dueAtEpochMillis <= nowEpochMillis) {
+        return if (state.lapses > 0) {
+            "À revoir · ${state.lapses} erreur${if (state.lapses > 1) "s" else ""}"
+        } else {
+            "À revoir"
+        }
+    }
+    val days = ceil((state.dueAtEpochMillis - nowEpochMillis) / DAY_MILLIS.toDouble()).toInt()
+    return when (days) {
+        1 -> "Demain"
+        else -> "Dans $days jours"
+    }
+}
+
+private const val MAX_VISIBLE_REVIEWS = 6
+private const val DAY_MILLIS = 24L * 60 * 60 * 1_000
 
 @Composable
 private fun MasteryMatrix(handStats: Map<String, HandStatistics>) {

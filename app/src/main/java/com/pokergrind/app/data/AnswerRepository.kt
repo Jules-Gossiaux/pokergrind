@@ -39,6 +39,13 @@ class AnswerRepository(
 
     fun observeFreeAnswerCount(): Flow<Int> = answerDao.observeFreeAnswerCount()
 
+    fun observeReviewStates(): Flow<Map<Pair<String, String>, ReviewState>> =
+        reviewDao.observeAll().map { entities ->
+            entities.associate { entity ->
+                (entity.spotId to entity.handNotation) to entity.toDomain()
+            }
+        }
+
     suspend fun ensureUnlocked(spotId: String) {
         spotUnlockDao.unlock(
             SpotUnlockEntity(

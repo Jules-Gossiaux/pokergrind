@@ -17,6 +17,7 @@ import com.pokergrind.app.domain.model.RangeDefinition
 import com.pokergrind.app.domain.statistics.StatisticsSnapshot
 import com.pokergrind.app.domain.training.GuidedSessionPlanner
 import com.pokergrind.app.domain.training.MasteryCalculator
+import com.pokergrind.app.domain.training.ReviewState
 import com.pokergrind.app.domain.training.SessionFactory
 import com.pokergrind.app.domain.training.SpotMastery
 import com.pokergrind.app.domain.training.TrainingMode
@@ -36,6 +37,7 @@ data class PokerGrindUiState(
     val masteryBySpot: Map<String, SpotMastery> = emptyMap(),
     val unlockedSpotIds: Set<String> = emptySet(),
     val statistics: StatisticsSnapshot = StatisticsSnapshot(),
+    val reviewStates: Map<Pair<String, String>, ReviewState> = emptyMap(),
 ) {
     val btnMastery: SpotMastery
         get() = masteryBySpot[BtnOpenRange.definition.id] ?: MasteryCalculator.empty
@@ -75,7 +77,8 @@ class PokerGrindViewModel(application: Application) : AndroidViewModel(applicati
         masteryFlow,
         answerRepository.observeUnlockedSpotIds(),
         statisticsRepository.statistics,
-    ) { progress, masteryBySpot, unlockedSpotIds, statistics ->
+        answerRepository.observeReviewStates(),
+    ) { progress, masteryBySpot, unlockedSpotIds, statistics, reviewStates ->
         ranges.zipWithNext().forEach { (current, next) ->
             if (masteryBySpot.getValue(current.id).isMastered && next.id !in unlockedSpotIds) {
                 viewModelScope.launch { answerRepository.ensureUnlocked(next.id) }
@@ -85,6 +88,7 @@ class PokerGrindViewModel(application: Application) : AndroidViewModel(applicati
             masteryBySpot = masteryBySpot,
             unlockedSpotIds = unlockedSpotIds,
             statistics = statistics,
+            reviewStates = reviewStates,
         )
     }
         .stateIn(
@@ -164,6 +168,7 @@ class PokerGrindViewModel(application: Application) : AndroidViewModel(applicati
         masteryBySpot: Map<String, SpotMastery>,
         unlockedSpotIds: Set<String>,
         statistics: StatisticsSnapshot,
+        reviewStates: Map<Pair<String, String>, ReviewState>,
     ) = PokerGrindUiState(
         isLoading = false,
         xp = xp,
@@ -173,5 +178,6 @@ class PokerGrindViewModel(application: Application) : AndroidViewModel(applicati
         masteryBySpot = masteryBySpot,
         unlockedSpotIds = unlockedSpotIds,
         statistics = statistics,
+        reviewStates = reviewStates,
     )
 }

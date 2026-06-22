@@ -4,9 +4,13 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ReviewDao {
+    @Query("SELECT * FROM review_items")
+    fun observeAll(): Flow<List<ReviewItemEntity>>
+
     @Query("SELECT * FROM review_items WHERE spotId IN (:spotIds)")
     suspend fun getForSpots(spotIds: List<String>): List<ReviewItemEntity>
 

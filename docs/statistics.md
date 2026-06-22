@@ -14,6 +14,7 @@ certification.
 - matrice 13 × 13 par spot, dont chaque case est remplie selon le taux de
   réussite historique de la main ;
 - volume séparé d'entraînement libre.
+- détail replié des prochaines révisions du spot sélectionné.
 
 Une case grise indique qu'aucune réponse guidée n'existe encore. Le remplissage
 représente directement le pourcentage de réussite historique de la main. Sa
@@ -30,6 +31,11 @@ pourcentage et ne remplace pas l'information chiffrée.
 Une main doit avoir au moins deux réponses guidées avant d'entrer dans les
 classements forts/faibles. Ce seuil volontairement bas sera relevé lorsque
 l'historique utilisateur sera plus important.
+
+Le détail des révisions est masqué par défaut. Une action
+`Prochaines révisions` affiche au maximum six mains, leur échéance en langage
+simple et le nombre d'erreurs lorsqu'elles sont déjà dues. Les paramètres
+techniques internes restent volontairement cachés.
 
 ## Interprétation
 

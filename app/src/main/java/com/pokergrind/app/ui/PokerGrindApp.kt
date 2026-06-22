@@ -90,6 +90,7 @@ fun PokerGrindApp(viewModel: PokerGrindViewModel = viewModel()) {
                 ranges = viewModel.ranges,
                 statistics = uiState.statistics,
                 masteryBySpot = uiState.masteryBySpot,
+                reviewStates = uiState.reviewStates,
                 unlockedSpotIds = uiState.unlockedSpotIds,
                 onBack = { destination = Destination.HOME },
             )
