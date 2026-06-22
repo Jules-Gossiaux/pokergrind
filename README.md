@@ -89,7 +89,7 @@ L'APK de debug est généré dans `app/build/outputs/apk/debug/`.
 Pour l'installer sans perdre les données existantes :
 
 ```powershell
-D:\Android\sdk\platform-tools\adb.exe -s IDENTIFIANT_APPAREIL install -r D:\code\PokerGrind\app\build\outputs\apk\debug\app-debug.apk
+.\scripts\install-phone.ps1
 ```
 
 ## État du projet

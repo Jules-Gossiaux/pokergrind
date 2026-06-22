@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -172,11 +173,17 @@ fun StatisticsScreen(
 @Composable
 private fun MasteryMatrix(handStats: Map<String, HandStatistics>) {
     Text("Maîtrise par main", style = MaterialTheme.typography.headlineMedium)
-    Text(
-        "Vert ≥ 90 % · orange 80–89 % · rouge < 80 % · gris : jamais vue",
-        color = TextSecondary,
-        fontSize = 13.sp,
-    )
+    Spacer(Modifier.height(6.dp))
+    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+            MasteryLegendItem(color = Success, label = "90–100 %")
+            MasteryLegendItem(color = MasteryMedium, label = "80–89 %")
+        }
+        Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+            MasteryLegendItem(color = Error, label = "< 80 %")
+            MasteryLegendItem(color = RangeFold, label = "Jamais vue")
+        }
+    }
     Spacer(Modifier.height(10.dp))
 
     Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
@@ -196,6 +203,25 @@ private fun MasteryMatrix(handStats: Map<String, HandStatistics>) {
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun MasteryLegendItem(
+    color: Color,
+    label: String,
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(7.dp),
+    ) {
+        Box(
+            modifier = Modifier
+                .size(10.dp)
+                .clip(RoundedCornerShape(50))
+                .background(color),
+        )
+        Text(label, color = TextSecondary, fontSize = 13.sp)
     }
 }
 

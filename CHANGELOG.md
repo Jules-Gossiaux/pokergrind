@@ -67,3 +67,6 @@ encore de version publiée.
 - matrice de maîtrise colorée en vert, orange ou rouge selon le taux par main ;
 - documentation produit, technique, installation et feuille de route
   réalignées sur la version 0.7.0.
+- légende de maîtrise remplacée par des pastilles colorées compactes ;
+- script PowerShell de compilation, mise à jour et lancement sur téléphone
+  physique sans perte de progression.

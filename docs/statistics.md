@@ -24,7 +24,8 @@ couleur facilite la lecture :
 - rouge : moins de 80 % ;
 - gris : aucune réponse guidée.
 
-La couleur complète le pourcentage et ne remplace pas l'information chiffrée.
+La légende utilise des pastilles colorées compactes. La couleur complète le
+pourcentage et ne remplace pas l'information chiffrée.
 
 Une main doit avoir au moins deux réponses guidées avant d'entrer dans les
 classements forts/faibles. Ce seuil volontairement bas sera relevé lorsque
