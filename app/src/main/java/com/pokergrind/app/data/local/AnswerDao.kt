@@ -8,8 +8,17 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface AnswerDao {
+    @Query("SELECT * FROM answers ORDER BY answeredAtEpochMillis")
+    suspend fun getAll(): List<AnswerEntity>
+
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(answer: AnswerEntity): Long
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAll(answers: List<AnswerEntity>)
+
+    @Query("DELETE FROM answers")
+    suspend fun deleteAll()
 
     @Query(
         """

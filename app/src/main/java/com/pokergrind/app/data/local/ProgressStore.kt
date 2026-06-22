@@ -68,6 +68,17 @@ class ProgressStore(private val context: Context) {
         }
     }
 
+    suspend fun restore(progress: StoredProgress) {
+        context.progressDataStore.edit { preferences ->
+            preferences.clear()
+            preferences[XP] = progress.xp
+            preferences[STREAK] = progress.streak
+            progress.lastCompletedDate?.let { preferences[LAST_COMPLETED_DATE] = it.toString() }
+            writeSession(preferences, progress.guidedSession)
+            writeSession(preferences, progress.freeSession)
+        }
+    }
+
     suspend fun discardSession(mode: TrainingMode) {
         context.progressDataStore.edit { preferences ->
             val keys = keysFor(mode)
@@ -189,6 +200,19 @@ class ProgressStore(private val context: Context) {
         preferences.remove(SESSION_INDEX)
         preferences.remove(SESSION_CORRECT)
         preferences.remove(SESSION_SELECTED_ACTION)
+    }
+
+    private fun writeSession(
+        preferences: androidx.datastore.preferences.core.MutablePreferences,
+        session: StoredTrainingSession?,
+    ) {
+        if (session == null) return
+        val keys = keysFor(session.mode)
+        preferences[keys.id] = session.id
+        preferences[keys.questions] = encodeQuestions(session.questions)
+        preferences[keys.index] = session.questionIndex
+        preferences[keys.correct] = session.correctCount
+        session.selectedAction?.let { preferences[keys.selectedAction] = it.name }
     }
 
     private fun updateStreak(preferences: androidx.datastore.preferences.core.MutablePreferences, today: LocalDate) {

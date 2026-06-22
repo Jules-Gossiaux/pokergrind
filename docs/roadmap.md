@@ -17,6 +17,8 @@ Cette feuille de route décrit l'ordre de travail, sans date de livraison.
 - table 6-max native et matrices de ranges reconstruites ;
 - consultation d'une range depuis l'accueil ou après une réponse ;
 - statistiques par spot, classements et matrice colorée par main ;
+- navigation Fondations → Opens, prête à accueillir les prochains chapitres ;
+- export et restauration locale de toute la progression ;
 - tests unitaires, Android Lint et essais sur émulateur et téléphone.
 
 ## Prochaine étape — Stabilisation du MVP
@@ -26,8 +28,10 @@ Cette feuille de route décrit l'ordre de travail, sans date de livraison.
    révisions restantes ;
 3. ajouter des tests Compose sur les parcours critiques ;
 4. vérifier l'accessibilité et les tailles d'écran ;
-5. documenter les sauvegardes et migrations locales ;
-6. générer une APK release signée.
+5. ajouter des tests automatisés d'import/export.
+
+La signature release est volontairement reportée : pendant le développement,
+l'APK debug reste plus simple à construire, installer et mettre à jour.
 
 ## Module suivant — Défenses de grosse blinde
 

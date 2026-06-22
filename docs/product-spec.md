@@ -37,6 +37,10 @@ Le premier incrément couvre uniquement les open ranges, dans cet ordre :
 
 Un spot verrouillé devient disponible lorsque le spot précédent est maîtrisé.
 
+L'accueil présente les grands chapitres des Fondations. `Opens` ouvre le
+parcours détaillé actuel ; `Défenses BB` et `3-bets` restent visibles mais
+verrouillés tant que leur contenu n'est pas développé.
+
 Les cinq ranges d'open sont intégrées. Les sessions guidées
 garantissent qu'au moins quatre questions proviennent de chaque range
 débloquée et disponible, avant de consacrer le reste du budget aux révisions
@@ -180,4 +184,6 @@ réponse guidée.
 - les erreurs sont reproposées plus tôt que les acquis ;
 - les ranges affichées correspondent exactement aux données validées ;
 - fermer et rouvrir l'app conserve progression, historique et session ;
+- l'utilisateur peut exporter puis restaurer sa progression dans un fichier
+  local ;
 - l'interface reste lisible et réactive sur un téléphone Android courant.

@@ -47,7 +47,7 @@ D:\Android\sdk\platform-tools\adb.exe -s IDENTIFIANT_APPAREIL install -r D:\code
 L'option `-r` conserve les données locales et la progression. Sans `-s`, ADB
 peut cibler le mauvais appareil si un émulateur est également démarré.
 
-## Signature et conservation des données
+## Conservation des données
 
 Android accepte une mise à jour seulement si elle possède le même
 `applicationId` et la même signature que l'application installée. Les APK de
@@ -55,9 +55,22 @@ debug sont signés automatiquement par Android Studio avec la clé debug de cet
 ordinateur. Ils se mettent donc à jour sans perdre les données avec
 `install -r` ou le bouton Run d'Android Studio.
 
-Une APK release signée avec une clé privée durable sera nécessaire avant de
-distribuer l'application ou de garantir les mises à jour depuis un autre
-ordinateur. Elle n'est pas requise pour les tests personnels actuels.
+La signature release est hors périmètre pendant la phase de développement.
+Elle sera configurée seulement lorsqu'une version stable devra être distribuée.
+
+## Sauvegarder avant une désinstallation
+
+Depuis l'écran Fondations :
+
+1. faire défiler jusqu'à `Tes données` ;
+2. appuyer sur `Sauvegarder` ;
+3. choisir un emplacement pour le fichier JSON.
+
+Le fichier contient l'historique, les révisions, les déblocages, l'XP, la série
+et les sessions en cours. `Restaurer` remplace les données locales après
+confirmation. Cette sauvegarde est recommandée avant une désinstallation ou un
+changement de téléphone ; elle n'est pas nécessaire pour une mise à jour avec
+`install -r`.
 
 ## Lancer l'application
 

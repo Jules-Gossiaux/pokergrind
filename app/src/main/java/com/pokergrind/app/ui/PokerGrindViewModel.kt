@@ -1,9 +1,11 @@
 package com.pokergrind.app.ui
 
 import android.app.Application
+import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.pokergrind.app.data.AnswerRepository
+import com.pokergrind.app.data.BackupManager
 import com.pokergrind.app.data.BtnOpenRange
 import com.pokergrind.app.data.OpenRanges
 import com.pokergrind.app.data.StatisticsRepository
@@ -58,6 +60,7 @@ class PokerGrindViewModel(application: Application) : AndroidViewModel(applicati
         progressStore = progressStore,
     )
     private val statisticsRepository = StatisticsRepository(database.answerDao())
+    private val backupManager = BackupManager(application, database, progressStore)
     val ranges: List<RangeDefinition> = OpenRanges.all
     private val rangesById = ranges.associateBy(RangeDefinition::id)
     private val btnRange = BtnOpenRange.definition
@@ -162,6 +165,22 @@ class PokerGrindViewModel(application: Application) : AndroidViewModel(applicati
     fun rangeForCurrentQuestion(mode: TrainingMode): RangeDefinition {
         val spotId = uiState.value.sessionFor(mode)?.currentQuestion?.spotId
         return rangesById[spotId] ?: btnRange
+    }
+
+    fun exportBackup(uri: Uri, onResult: (Result<Unit>) -> Unit) {
+        viewModelScope.launch {
+            onResult(runCatching { backupManager.exportTo(uri) })
+        }
+    }
+
+    fun importBackup(uri: Uri, onResult: (Result<Unit>) -> Unit) {
+        viewModelScope.launch {
+            val result = runCatching {
+                backupManager.importFrom(uri)
+                answerRepository.ensureUnlocked(btnRange.id)
+            }
+            onResult(result)
+        }
     }
 
     private fun StoredProgress.toUiState(

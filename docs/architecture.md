@@ -126,6 +126,15 @@ Le catalogue préflop peut être remplacé dans les tests par une version rédui
 L'horloge et le générateur aléatoire sont injectables pour rendre les tests
 déterministes.
 
+La navigation présente d'abord les grands chapitres dans `FondationsScreen`.
+Le parcours actuel vit dans `OpensScreen`. Cette séparation évite que l'ajout
+des défenses BB ou des 3-bets surcharge l'accueil.
+
+L'export local sérialise explicitement les entités Room et l'état DataStore
+dans un fichier JSON versionné choisi via le sélecteur Android. La restauration
+remplace les tables et l'état léger dans une opération contrôlée, sans copier
+les fichiers internes pendant qu'ils sont ouverts.
+
 ## 8. Tests attendus
 
 - tests exhaustifs des 169 catégories de mains par range ;

@@ -45,7 +45,7 @@ import com.pokergrind.app.ui.theme.SurfaceSoft
 import com.pokergrind.app.ui.theme.TextSecondary
 
 @Composable
-fun HomeScreen(
+fun OpensScreen(
     ranges: List<RangeDefinition>,
     xp: Int,
     streak: Int,
@@ -56,6 +56,7 @@ fun HomeScreen(
     onStartTraining: () -> Unit,
     onOpenFreeTraining: () -> Unit,
     onOpenStatistics: () -> Unit,
+    onBack: () -> Unit,
 ) {
     val firstRange = ranges.first()
     val firstMastery = masteryBySpot[firstRange.id] ?: MasteryCalculator.empty
@@ -222,6 +223,16 @@ fun HomeScreen(
                 ) {
                     Text("Statistiques")
                 }
+            }
+            Spacer(Modifier.height(8.dp))
+            OutlinedButton(
+                onClick = onBack,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(46.dp),
+                shape = RoundedCornerShape(16.dp),
+            ) {
+                Text("Retour aux fondations")
             }
         }
     }

@@ -9,6 +9,9 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface ReviewDao {
     @Query("SELECT * FROM review_items")
+    suspend fun getAll(): List<ReviewItemEntity>
+
+    @Query("SELECT * FROM review_items")
     fun observeAll(): Flow<List<ReviewItemEntity>>
 
     @Query("SELECT * FROM review_items WHERE spotId IN (:spotIds)")
@@ -25,4 +28,10 @@ interface ReviewDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun upsert(item: ReviewItemEntity)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun upsertAll(items: List<ReviewItemEntity>)
+
+    @Query("DELETE FROM review_items")
+    suspend fun deleteAll()
 }

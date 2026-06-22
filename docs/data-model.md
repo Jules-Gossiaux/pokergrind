@@ -166,7 +166,20 @@ l'historique. Elles ne sont pas stockées comme des compteurs séparés, ce qui
 DataStore reste responsable du petit état transactionnel de l'interface :
 session en cours, XP et série.
 
-## 5. Validation des ranges
+## 5. Sauvegarde portable
+
+Le format de sauvegarde JSON contient :
+
+- un numéro de version du format ;
+- le profil DataStore, y compris les deux sessions ;
+- tous les `AnswerRecord` ;
+- tous les `ReviewItem` ;
+- les déblocages de spots.
+
+La restauration remplace les données locales. Le fichier ne contient ni compte,
+ni information réseau, puisque l'application reste entièrement hors ligne.
+
+## 6. Validation des ranges
 
 Pour chaque fichier de données :
 

@@ -98,3 +98,6 @@ Les cinq ranges d'open 6-max sont disponibles : parcours progressif,
 sessions guidées multi-spots, entraînement libre ciblé, répétition espacée,
 XP, série, table 6-max native, statistiques par spot et matrice de maîtrise,
 feedback Open/Fold et visualisation des ranges depuis l'accueil ou le feedback.
+
+L'accueil est organisé par chapitres (`Fondations → Opens`) et permet
+d'exporter ou restaurer toute la progression dans un fichier local.

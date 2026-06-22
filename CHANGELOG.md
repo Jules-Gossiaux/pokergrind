@@ -82,3 +82,7 @@ encore de version publiée.
 - détail minimal et replié des prochaines révisions dans Statistiques ;
 - nombre de révisions dues visible sans exposer les paramètres techniques du
   moteur.
+- nouvel accueil Fondations avec Opens, Défenses BB et 3-bets ;
+- parcours des ranges déplacé dans un écran Opens indépendant ;
+- export JSON et restauration locale de Room, DataStore et sessions en cours ;
+- signature release explicitement reportée pendant la phase de développement.
