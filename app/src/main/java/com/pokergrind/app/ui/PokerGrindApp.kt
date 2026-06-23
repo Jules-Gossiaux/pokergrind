@@ -124,6 +124,11 @@ fun PokerGrindApp(viewModel: PokerGrindViewModel = viewModel()) {
                         Destination.FREE_SPOT
                     }
                 },
+                onStartFreeSpot = { spotId ->
+                    viewModel.startFreeSession(spotId, replaceExisting = true)
+                    trainingMode = TrainingMode.FREE
+                    destination = Destination.TRAINING
+                },
                 onOpenStatistics = { destination = Destination.STATISTICS },
                 onExportBackup = {
                     exportLauncher.launch("pokergrind-backup-${java.time.LocalDate.now()}.json")

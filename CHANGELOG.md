@@ -88,5 +88,7 @@ encore de version publiée.
 - matrice de range compatible avec plusieurs actions colorées ;
 - roadmap plus compacte, ouverture automatique du chapitre le plus avancé,
   libellé `Mode libre` raccourci et fermeture des ranges par croix ;
+- lancement direct d'un entraînement libre depuis une carte de spot déverrouillée ;
+- conservation documentaire des ranges candidates restantes pour les défenses BB ;
 - export JSON et restauration locale de Room, DataStore et sessions en cours ;
 - signature release explicitement reportée pendant la phase de développement.

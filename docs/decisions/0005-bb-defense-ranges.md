@@ -93,13 +93,114 @@ spot sans avoir réellement rencontré des `Call`, des `3-bet` et des `Fold`.
 
 ## Hors périmètre immédiat
 
-Les autres spots sont documentés comme candidats mais ne sont pas codés dans
-ce premier incrément :
+Les autres spots sont conservés comme candidats mais ne sont pas codés dans
+ce premier incrément.
 
-- BB vs CO ;
-- BB vs SB ;
-- BB vs HJ ;
-- BB vs UTG.
+### BB vs UTG open
+
+3-bet value :
+
+- `AA-QQ`
+- `AKs`, `AKo`
+
+Call :
+
+- `JJ-22`
+- `AQs-AJs`
+- `KQs`
+- `QJs`
+- `JTs`
+- `T9s`
+- `98s`
+- `AQo`
+
+### BB vs HJ open
+
+3-bet :
+
+- `AA-QQ`
+- `AKs`, `AKo`
+- `AQs`
+
+Call :
+
+- `JJ-22`
+- `AJs-ATs`
+- `KQs-KJs`
+- `QJs`
+- `JTs`
+- `T9s`
+- `98s`
+- `87s`
+- `AQo`
+
+### BB vs CO open
+
+3-bet :
+
+- `AA-TT`
+- `AKs`, `AKo`
+- `AQs-AJs`
+- `KQs`
+
+Call :
+
+- `99-22`
+- `ATs-A2s`
+- `KJs-KTs`
+- `QJs-QTs`
+- `JTs-J9s`
+- `T9s`
+- `98s`
+- `87s`
+- `76s`
+- `AQo-AJo`
+- `KQo`
+
+### BB vs SB open
+
+3-bet :
+
+- `AA-99`
+- `AKs`, `AKo`
+- `AQs`, `AQo`
+- `AJs`, `AJo`
+- `A5s-A2s`
+- `KQs-KJs`
+
+Call :
+
+- `88-22`
+- tous les As suited ;
+- `KTs-K2s`
+- `QTs-Q5s`
+- `JTs-J7s`
+- `T9s-T7s`
+- `98s-86s`
+- `76s-54s`
+- `ATo-A2o`
+- `KQo-KTo`
+- `QJo-QTo`
+- `JTo`
+
+## Rappel : futur chapitre 3-bets
 
 `SB vs BTN` appartient au futur chapitre `3-bets`, pas au chapitre
 `Défenses BB`.
+
+Stratégie candidate débutant : 3-bet ou fold uniquement.
+
+3-bet :
+
+- `AA-99`
+- `AKs`, `AKo`
+- `AQs`, `AQo`
+- `AJs+`
+- `KQs`
+
+Fold :
+
+- toutes les autres mains.
+
+Cette range devra être normalisée avant codage, notamment pour éviter les
+doublons entre `AQs`, `AKs` et `AJs+`.

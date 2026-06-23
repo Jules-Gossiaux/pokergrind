@@ -128,8 +128,12 @@ class PokerGrindViewModel(application: Application) : AndroidViewModel(applicati
         }
     }
 
-    fun startFreeSession(spotId: String) {
-        if (uiState.value.freeSession?.isComplete == false) return
+    fun startFreeSession(spotId: String, replaceExisting: Boolean = false) {
+        val currentFreeSession = uiState.value.freeSession
+        if (currentFreeSession?.isComplete == false) {
+            val currentSpotId = currentFreeSession.questions.firstOrNull()?.spotId
+            if (!replaceExisting || currentSpotId == spotId) return
+        }
         val range = rangesById[spotId] ?: return
         if (spotId !in uiState.value.unlockedSpotIds) return
         viewModelScope.launch {

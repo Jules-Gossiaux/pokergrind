@@ -65,6 +65,7 @@ fun FoundationsScreen(
     unlockedSpotIds: Set<String>,
     onStartTraining: () -> Unit,
     onOpenFreeTraining: () -> Unit,
+    onStartFreeSpot: (String) -> Unit,
     onOpenStatistics: () -> Unit,
     onExportBackup: () -> Unit,
     onImportBackup: () -> Unit,
@@ -205,6 +206,7 @@ fun FoundationsScreen(
                     masteryBySpot = masteryBySpot,
                     unlockedSpotIds = unlockedSpotIds,
                     onViewRange = { displayedRange = it },
+                    onStartFreeSpot = onStartFreeSpot,
                 )
                 Spacer(Modifier.height(16.dp))
             } else {
@@ -239,6 +241,7 @@ fun FoundationsScreen(
                     masteryBySpot = masteryBySpot,
                     unlockedSpotIds = unlockedSpotIds,
                     onViewRange = { displayedRange = it },
+                    onStartFreeSpot = onStartFreeSpot,
                 )
             }
             Spacer(Modifier.height(12.dp))
@@ -346,6 +349,7 @@ private fun OpensPath(
     masteryBySpot: Map<String, SpotMastery>,
     unlockedSpotIds: Set<String>,
     onViewRange: (RangeDefinition) -> Unit,
+    onStartFreeSpot: (String) -> Unit,
 ) = TrainingPath(
     ranges = ranges,
     guidedSession = guidedSession,
@@ -353,6 +357,7 @@ private fun OpensPath(
     masteryBySpot = masteryBySpot,
     unlockedSpotIds = unlockedSpotIds,
     onViewRange = onViewRange,
+    onStartFreeSpot = onStartFreeSpot,
 )
 
 @Composable
@@ -363,6 +368,7 @@ private fun TrainingPath(
     masteryBySpot: Map<String, SpotMastery>,
     unlockedSpotIds: Set<String>,
     onViewRange: (RangeDefinition) -> Unit,
+    onStartFreeSpot: (String) -> Unit,
 ) {
     val activeRangeId = ranges.lastOrNull { range -> range.id in unlockedSpotIds }?.id
         ?: ranges.firstOrNull()?.id
@@ -388,6 +394,11 @@ private fun TrainingPath(
             showConnector = index < ranges.lastIndex,
             onViewRange = if (unlocked) {
                 { onViewRange(range) }
+            } else {
+                null
+            },
+            onStartFreeSpot = if (unlocked) {
+                { onStartFreeSpot(range.id) }
             } else {
                 null
             },
@@ -492,6 +503,7 @@ private fun PathStep(
     connectorUnlocked: Boolean = false,
     showConnector: Boolean = true,
     onViewRange: (() -> Unit)? = null,
+    onStartFreeSpot: (() -> Unit)? = null,
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -563,14 +575,27 @@ private fun PathStep(
                         fontWeight = FontWeight.SemiBold,
                         fontSize = 17.sp,
                     )
-                    if (onViewRange != null) {
-                        OutlinedButton(
-                            onClick = onViewRange,
-                            modifier = Modifier.height(38.dp),
-                            shape = RoundedCornerShape(13.dp),
-                            contentPadding = PaddingValues(horizontal = 12.dp),
+                    if (onViewRange != null && onStartFreeSpot != null) {
+                        Column(
+                            horizontalAlignment = Alignment.End,
+                            verticalArrangement = Arrangement.spacedBy(7.dp),
                         ) {
-                            Text("Voir range", fontSize = 13.sp, maxLines = 1)
+                            OutlinedButton(
+                                onClick = onViewRange,
+                                modifier = Modifier.height(36.dp),
+                                shape = RoundedCornerShape(13.dp),
+                                contentPadding = PaddingValues(horizontal = 12.dp),
+                            ) {
+                                Text("Voir range", fontSize = 13.sp, maxLines = 1)
+                            }
+                            Button(
+                                onClick = onStartFreeSpot,
+                                modifier = Modifier.height(36.dp),
+                                shape = RoundedCornerShape(13.dp),
+                                contentPadding = PaddingValues(horizontal = 14.dp),
+                            ) {
+                                Text("Jouer", fontSize = 13.sp, maxLines = 1)
+                            }
                         }
                     }
                 }
