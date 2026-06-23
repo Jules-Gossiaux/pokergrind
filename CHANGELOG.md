@@ -82,7 +82,11 @@ encore de version publiée.
 - détail minimal et replié des prochaines révisions dans Statistiques ;
 - nombre de révisions dues visible sans exposer les paramètres techniques du
   moteur.
-- nouvel accueil Fondations avec Opens, Défenses BB et 3-bets ;
-- parcours des ranges déplacé dans un écran Opens indépendant ;
+- accueil Fondations avec Opens, Défenses BB et 3-bets ;
+- chapitre Opens déroulant directement dans Fondations, sans écran intermédiaire ;
+- premier spot de défense BB (`BB vs BTN`) avec actions `Call`, `3-bet` et `Fold` ;
+- matrice de range compatible avec plusieurs actions colorées ;
+- roadmap plus compacte, ouverture automatique du chapitre le plus avancé,
+  libellé `Mode libre` raccourci et fermeture des ranges par croix ;
 - export JSON et restauration locale de Room, DataStore et sessions en cours ;
 - signature release explicitement reportée pendant la phase de développement.

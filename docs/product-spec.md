@@ -27,7 +27,7 @@ emploie `UTG` plutôt que `LJ / UTG` pour éviter une double nomenclature.
 
 ## 3. Premier module livrable
 
-Le premier incrément couvre uniquement les open ranges, dans cet ordre :
+Le premier incrément couvre les open ranges, dans cet ordre :
 
 1. Open BTN
 2. Open CO
@@ -37,9 +37,10 @@ Le premier incrément couvre uniquement les open ranges, dans cet ordre :
 
 Un spot verrouillé devient disponible lorsque le spot précédent est maîtrisé.
 
-L'accueil présente les grands chapitres des Fondations. `Opens` ouvre le
-parcours détaillé actuel ; `Défenses BB` et `3-bets` restent visibles mais
-verrouillés tant que leur contenu n'est pas développé.
+L'accueil présente les grands chapitres des Fondations. `Opens` se déplie sur
+la même page pour afficher le parcours détaillé actuel. `Défenses BB` devient
+le chapitre suivant et contient d'abord `BB vs BTN`. `3-bets` reste visible
+mais verrouillé tant que son contenu n'est pas développé.
 
 Les cinq ranges d'open sont intégrées. Les sessions guidées
 garantissent qu'au moins quatre questions proviennent de chaque range
@@ -50,7 +51,7 @@ les plus prioritaires.
 
 Après les open ranges :
 
-1. Défense BB vs BTN
+1. Défense BB vs BTN — premier spot intégré
 2. Défense BB vs CO
 3. Défense BB vs SB
 4. 3-bet SB vs BTN
@@ -58,8 +59,8 @@ Après les open ranges :
 6. Défense contre les 3-bets
 7. Récapitulatif général
 
-Cette liste sert à préserver la cohérence de l'architecture. Elle n'autorise
-pas son implémentation dans le premier incrément.
+Cette liste sert à préserver la cohérence de l'architecture. Seul `BB vs BTN`
+est intégré pour l'instant.
 
 ## 5. Question d'entraînement
 
@@ -69,14 +70,15 @@ Une question présente :
 - la profondeur de 100 BB ;
 - le sizing d'open de 2,5 BB ;
 - une catégorie de main, par exemple `A8s` ;
-- les actions possibles, `Open` ou `Fold` pour les open ranges ;
+- les actions possibles du spot : `Open/Fold` pour les open ranges,
+  `Call/3-bet/Fold` pour les défenses BB ;
 - un chronomètre discret, sans pénalité.
 
 Après la réponse :
 
 - `Correct` ou `Incorrect` est affiché immédiatement ;
 - la bonne action est indiquée ;
-- le bouton `Voir la range` ouvre une matrice reconstruite par l'application ;
+- le bouton `Voir range` ouvre une matrice reconstruite par l'application ;
 - l'utilisateur peut rapidement passer à la question suivante.
 
 Chaque range débloquée peut également être consultée depuis sa carte sur

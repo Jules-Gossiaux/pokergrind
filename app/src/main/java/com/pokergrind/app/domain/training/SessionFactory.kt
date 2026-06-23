@@ -13,11 +13,15 @@ object SessionFactory {
         random: Random = Random.Default,
     ): List<HandCategory> {
         val byAction = range.entries.groupBy { it.action }
-        val perAction = DAILY_SESSION_SIZE / 2
+        val actions = range.availableActions
+        val perAction = (DAILY_SESSION_SIZE / actions.size).coerceAtLeast(1)
+        val remainder = DAILY_SESSION_SIZE - perAction * actions.size
 
         return buildList {
-            addAll(byAction.getValue(PokerAction.OPEN).shuffled(random).take(perAction))
-            addAll(byAction.getValue(PokerAction.FOLD).shuffled(random).take(perAction))
+            actions.forEachIndexed { index, action ->
+                val target = perAction + if (index < remainder) 1 else 0
+                addAll(byAction.getValue(action).shuffled(random).take(target))
+            }
         }
             .shuffled(random)
             .map { it.hand }

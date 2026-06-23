@@ -22,14 +22,12 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.pokergrind.app.data.BtnOpenRange
 import com.pokergrind.app.domain.training.TrainingMode
 import com.pokergrind.app.ui.home.FoundationsScreen
-import com.pokergrind.app.ui.home.OpensScreen
 import com.pokergrind.app.ui.statistics.StatisticsScreen
 import com.pokergrind.app.ui.training.FreeSpotScreen
 import com.pokergrind.app.ui.training.TrainingScreen
 
 private enum class Destination {
     FOUNDATIONS,
-    OPENS,
     FREE_SPOT,
     STATISTICS,
     TRAINING,
@@ -68,11 +66,10 @@ fun PokerGrindApp(viewModel: PokerGrindViewModel = viewModel()) {
 
     BackHandler(enabled = destination != Destination.FOUNDATIONS) {
         destination = when (destination) {
-            Destination.OPENS -> Destination.FOUNDATIONS
             Destination.FREE_SPOT,
             Destination.STATISTICS,
             Destination.TRAINING,
-            -> Destination.OPENS
+            -> Destination.FOUNDATIONS
             Destination.FOUNDATIONS -> Destination.FOUNDATIONS
         }
     }
@@ -94,25 +91,22 @@ fun PokerGrindApp(viewModel: PokerGrindViewModel = viewModel()) {
 
         when (destination) {
             Destination.FOUNDATIONS -> FoundationsScreen(
+                openRanges = viewModel.openRanges,
+                bbDefenseRanges = viewModel.bbDefenseRanges,
                 xp = uiState.xp,
                 streak = uiState.streak,
-                masteredOpenSpots = uiState.masteryBySpot.values.count { it.isMastered },
+                masteredOpenSpots = viewModel.openRanges.count { range ->
+                    uiState.masteryBySpot[range.id]?.isMastered == true
+                },
                 unlockedOpenSpots = uiState.unlockedSpotIds.count { id ->
-                    viewModel.ranges.any { it.id == id }
+                    viewModel.openRanges.any { it.id == id }
                 },
-                hasGuidedSession = uiState.guidedSession?.isComplete == false,
-                hasFreeSession = uiState.freeSession?.isComplete == false,
-                onOpenRanges = { destination = Destination.OPENS },
-                onExportBackup = {
-                    exportLauncher.launch("pokergrind-backup-${java.time.LocalDate.now()}.json")
+                masteredBbDefenseSpots = viewModel.bbDefenseRanges.count { range ->
+                    uiState.masteryBySpot[range.id]?.isMastered == true
                 },
-                onImportBackup = { importLauncher.launch(arrayOf("application/json", "text/plain")) },
-            )
-
-            Destination.OPENS -> OpensScreen(
-                ranges = viewModel.ranges,
-                xp = uiState.xp,
-                streak = uiState.streak,
+                unlockedBbDefenseSpots = uiState.unlockedSpotIds.count { id ->
+                    viewModel.bbDefenseRanges.any { it.id == id }
+                },
                 guidedSession = uiState.guidedSession?.takeUnless { it.isComplete },
                 freeSession = uiState.freeSession?.takeUnless { it.isComplete },
                 masteryBySpot = uiState.masteryBySpot,
@@ -131,7 +125,10 @@ fun PokerGrindApp(viewModel: PokerGrindViewModel = viewModel()) {
                     }
                 },
                 onOpenStatistics = { destination = Destination.STATISTICS },
-                onBack = { destination = Destination.FOUNDATIONS },
+                onExportBackup = {
+                    exportLauncher.launch("pokergrind-backup-${java.time.LocalDate.now()}.json")
+                },
+                onImportBackup = { importLauncher.launch(arrayOf("application/json", "text/plain")) },
             )
 
             Destination.FREE_SPOT -> FreeSpotScreen(
@@ -143,7 +140,7 @@ fun PokerGrindApp(viewModel: PokerGrindViewModel = viewModel()) {
                     trainingMode = TrainingMode.FREE
                     destination = Destination.TRAINING
                 },
-                onBack = { destination = Destination.OPENS },
+                onBack = { destination = Destination.FOUNDATIONS },
             )
 
             Destination.STATISTICS -> StatisticsScreen(
@@ -152,7 +149,7 @@ fun PokerGrindApp(viewModel: PokerGrindViewModel = viewModel()) {
                 masteryBySpot = uiState.masteryBySpot,
                 reviewStates = uiState.reviewStates,
                 unlockedSpotIds = uiState.unlockedSpotIds,
-                onBack = { destination = Destination.OPENS },
+                onBack = { destination = Destination.FOUNDATIONS },
             )
 
             Destination.TRAINING -> TrainingScreen(
@@ -172,7 +169,7 @@ fun PokerGrindApp(viewModel: PokerGrindViewModel = viewModel()) {
                         else -> viewModel.startGuidedSession()
                     }
                 },
-                onBack = { destination = Destination.OPENS },
+                onBack = { destination = Destination.FOUNDATIONS },
             )
         }
     }

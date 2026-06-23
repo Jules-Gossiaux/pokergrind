@@ -10,14 +10,15 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -30,8 +31,10 @@ import androidx.compose.ui.window.DialogProperties
 import com.pokergrind.app.domain.model.HandCategory
 import com.pokergrind.app.domain.model.PokerAction
 import com.pokergrind.app.domain.model.RangeDefinition
+import com.pokergrind.app.ui.theme.RangeCall
 import com.pokergrind.app.ui.theme.RangeFold
 import com.pokergrind.app.ui.theme.RangeOpen
+import com.pokergrind.app.ui.theme.RangeThreeBet
 import com.pokergrind.app.ui.theme.TextSecondary
 import java.util.Locale
 
@@ -52,79 +55,93 @@ fun RangeDialog(
             shape = RoundedCornerShape(28.dp),
             color = MaterialTheme.colorScheme.background,
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp),
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Column {
-                        Text(range.title, style = MaterialTheme.typography.headlineMedium)
-                        Text(
-                            text = String.format(
-                                Locale.FRANCE,
-                                "%.2f %% · %d combinaisons",
-                                range.openPercentage,
-                                range.openComboCount,
-                            ),
-                            color = TextSecondary,
-                        )
-                    }
-                    Button(onClick = onDismiss) {
-                        Text("Fermer")
-                    }
-                }
-
-                Row(
-                    modifier = Modifier.padding(vertical = 14.dp),
-                    horizontalArrangement = Arrangement.spacedBy(18.dp),
-                ) {
-                    LegendItem(color = RangeOpen, label = "Open")
-                    LegendItem(color = RangeFold, label = "Fold")
-                }
-
-                LazyVerticalGrid(
-                    columns = GridCells.Fixed(13),
+            Box(Modifier.fillMaxSize()) {
+                TextButton(
+                    onClick = onDismiss,
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f),
-                    userScrollEnabled = false,
-                    horizontalArrangement = Arrangement.spacedBy(2.dp),
-                    verticalArrangement = Arrangement.spacedBy(2.dp),
+                        .align(Alignment.TopEnd)
+                        .padding(top = 10.dp, end = 10.dp)
+                        .size(44.dp),
                 ) {
-                    items(range.entries, key = { it.hand.notation }) { entry ->
-                        val highlighted = entry.hand.notation == highlightedHand?.notation
-                        Box(
-                            modifier = Modifier
-                                .aspectRatio(1f)
-                                .background(
-                                    color = if (entry.action == PokerAction.OPEN) RangeOpen else RangeFold,
-                                    shape = RoundedCornerShape(3.dp),
-                                )
-                                .then(
-                                    if (highlighted) {
-                                        Modifier.border(
-                                            width = 2.dp,
-                                            color = MaterialTheme.colorScheme.secondary,
-                                            shape = RoundedCornerShape(3.dp),
-                                        )
-                                    } else {
-                                        Modifier
-                                    },
-                                ),
-                            contentAlignment = Alignment.Center,
-                        ) {
+                    Text("×", fontSize = 28.sp, fontWeight = FontWeight.Bold)
+                }
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp),
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(end = 52.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Column {
+                            Text(range.title, style = MaterialTheme.typography.headlineMedium)
                             Text(
-                                text = entry.hand.notation,
-                                color = if (entry.action == PokerAction.OPEN) Color(0xFF102335) else Color.White,
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 7.sp,
-                                maxLines = 1,
+                                text = String.format(
+                                    Locale.FRANCE,
+                                    "%s · %d combinaisons jouées",
+                                    range.playedActionsSummary(),
+                                    range.entries
+                                        .filter { it.action != PokerAction.FOLD }
+                                        .sumOf { it.hand.comboCount },
+                                ),
+                                color = TextSecondary,
                             )
+                        }
+                    }
+
+                    Row(
+                        modifier = Modifier.padding(vertical = 14.dp),
+                        horizontalArrangement = Arrangement.spacedBy(18.dp),
+                    ) {
+                        range.availableActions.forEach { action ->
+                            LegendItem(color = action.rangeColor(), label = action.rangeLabel())
+                        }
+                    }
+
+                    LazyVerticalGrid(
+                        columns = GridCells.Fixed(13),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f),
+                        userScrollEnabled = false,
+                        horizontalArrangement = Arrangement.spacedBy(2.dp),
+                        verticalArrangement = Arrangement.spacedBy(2.dp),
+                    ) {
+                        items(range.entries, key = { it.hand.notation }) { entry ->
+                            val highlighted = entry.hand.notation == highlightedHand?.notation
+                            Box(
+                                modifier = Modifier
+                                    .aspectRatio(1f)
+                                    .background(
+                                        color = entry.action.rangeColor(),
+                                        shape = RoundedCornerShape(3.dp),
+                                    )
+                                    .then(
+                                        if (highlighted) {
+                                            Modifier.border(
+                                                width = 2.dp,
+                                                color = MaterialTheme.colorScheme.secondary,
+                                                shape = RoundedCornerShape(3.dp),
+                                            )
+                                        } else {
+                                            Modifier
+                                        },
+                                    ),
+                                contentAlignment = Alignment.Center,
+                            ) {
+                                Text(
+                                    text = entry.hand.notation,
+                                    color = if (entry.action == PokerAction.FOLD) Color.White else Color(0xFF102335),
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 7.sp,
+                                    maxLines = 1,
+                                )
+                            }
                         }
                     }
                 }
@@ -132,6 +149,29 @@ fun RangeDialog(
         }
     }
 }
+
+private fun RangeDefinition.playedActionsSummary(): String =
+    availableActions
+        .filterNot { it == PokerAction.FOLD }
+        .joinToString(" · ") { action ->
+            String.format(Locale.FRANCE, "%s %.1f%%", action.rangeLabel(), percentageFor(action))
+        }
+
+private fun PokerAction.rangeColor(): Color =
+    when (this) {
+        PokerAction.OPEN -> RangeOpen
+        PokerAction.CALL -> RangeCall
+        PokerAction.THREE_BET -> RangeThreeBet
+        PokerAction.FOLD -> RangeFold
+    }
+
+private fun PokerAction.rangeLabel(): String =
+    when (this) {
+        PokerAction.OPEN -> "Open"
+        PokerAction.CALL -> "Call"
+        PokerAction.THREE_BET -> "3-bet"
+        PokerAction.FOLD -> "Fold"
+    }
 
 @Composable
 private fun LegendItem(color: Color, label: String) {

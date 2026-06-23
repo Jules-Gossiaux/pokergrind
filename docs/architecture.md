@@ -126,9 +126,11 @@ Le catalogue préflop peut être remplacé dans les tests par une version rédui
 L'horloge et le générateur aléatoire sont injectables pour rendre les tests
 déterministes.
 
-La navigation présente d'abord les grands chapitres dans `FondationsScreen`.
-Le parcours actuel vit dans `OpensScreen`. Cette séparation évite que l'ajout
-des défenses BB ou des 3-bets surcharge l'accueil.
+La navigation présente les grands chapitres dans `FoundationsScreen`.
+Le chapitre `Opens` se déplie directement sur cette page pour afficher le
+parcours BTN → SB, sans changer d'écran. Les futurs chapitres (`Défenses BB`,
+`3-bets`) restent visibles dans la même liste et pourront adopter le même
+modèle d'accordéon.
 
 L'export local sérialise explicitement les entités Room et l'état DataStore
 dans un fichier JSON versionné choisi via le sélecteur Android. La restauration

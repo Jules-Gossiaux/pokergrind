@@ -15,6 +15,7 @@ data class SpotMastery(
     val successRatePercent: Int,
     val distinctOpenHands: Int,
     val distinctFoldHands: Int,
+    val distinctHandsByAction: Map<PokerAction, Int>,
     val isMastered: Boolean,
 ) {
     val answersRemaining: Int
@@ -25,8 +26,12 @@ object MasteryCalculator {
     const val WINDOW_SIZE = 30
     const val REQUIRED_CORRECT = 27
     const val REQUIRED_DISTINCT_PER_ACTION = 8
+    const val REQUIRED_DISTINCT_PER_ACTION_THREE_WAY = 5
 
-    fun calculate(recentAnswers: List<AnswerSnapshot>): SpotMastery {
+    fun calculate(
+        recentAnswers: List<AnswerSnapshot>,
+        requiredActions: Set<PokerAction> = setOf(PokerAction.OPEN, PokerAction.FOLD),
+    ): SpotMastery {
         val window = recentAnswers.take(WINDOW_SIZE)
         val correctCount = window.count(AnswerSnapshot::isCorrect)
         val distinctOpenHands = window
@@ -39,11 +44,19 @@ object MasteryCalculator {
             .map(AnswerSnapshot::handNotation)
             .distinct()
             .size
+        val distinctHandsByAction = window
+            .groupBy(AnswerSnapshot::expectedAction)
+            .mapValues { (_, answers) ->
+                answers.map(AnswerSnapshot::handNotation).distinct().size
+            }
         val successRate = if (window.isEmpty()) {
             0
         } else {
             (correctCount.toDouble() / window.size * 100).roundToInt()
         }
+        val hasEnoughDiversity = requiredActions.all { action ->
+            (distinctHandsByAction[action] ?: 0) >= requiredDistinctFor(requiredActions.size)
+            }
 
         return SpotMastery(
             answerCount = window.size,
@@ -51,12 +64,15 @@ object MasteryCalculator {
             successRatePercent = successRate,
             distinctOpenHands = distinctOpenHands,
             distinctFoldHands = distinctFoldHands,
+            distinctHandsByAction = distinctHandsByAction,
             isMastered = window.size == WINDOW_SIZE &&
                 correctCount >= REQUIRED_CORRECT &&
-                distinctOpenHands >= REQUIRED_DISTINCT_PER_ACTION &&
-                distinctFoldHands >= REQUIRED_DISTINCT_PER_ACTION,
+                hasEnoughDiversity,
         )
     }
+
+    fun requiredDistinctFor(actionCount: Int): Int =
+        if (actionCount >= 3) REQUIRED_DISTINCT_PER_ACTION_THREE_WAY else REQUIRED_DISTINCT_PER_ACTION
 
     val empty: SpotMastery
         get() = calculate(emptyList())

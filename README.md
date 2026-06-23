@@ -94,10 +94,12 @@ Pour l'installer sans perdre les données existantes :
 
 ## État du projet
 
-Les cinq ranges d'open 6-max sont disponibles : parcours progressif,
+Les cinq ranges d'open 6-max sont disponibles, ainsi que le premier spot de
+défense BB (`BB vs BTN`) préparé pour le chapitre suivant : parcours progressif,
 sessions guidées multi-spots, entraînement libre ciblé, répétition espacée,
 XP, série, table 6-max native, statistiques par spot et matrice de maîtrise,
-feedback Open/Fold et visualisation des ranges depuis l'accueil ou le feedback.
+feedback par action et visualisation des ranges depuis l'accueil ou le feedback.
 
-L'accueil est organisé par chapitres (`Fondations → Opens`) et permet
-d'exporter ou restaurer toute la progression dans un fichier local.
+L'accueil est organisé par chapitres. `Opens` se déplie directement dans
+`Fondations`, et l'app permet d'exporter ou restaurer toute la progression
+dans un fichier local.

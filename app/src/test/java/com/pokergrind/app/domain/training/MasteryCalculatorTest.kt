@@ -55,6 +55,30 @@ class MasteryCalculatorTest {
         assertEquals(30, mastery.correctCount)
     }
 
+    @Test
+    fun `three action spot requires coverage for call three bet and fold`() {
+        val answers = List(30) { index ->
+            val action = when (index % 3) {
+                0 -> PokerAction.CALL
+                1 -> PokerAction.THREE_BET
+                else -> PokerAction.FOLD
+            }
+            AnswerSnapshot(
+                handNotation = "${action.name}-$index",
+                expectedAction = action,
+                isCorrect = index < 27,
+            )
+        }
+
+        val mastery = MasteryCalculator.calculate(
+            recentAnswers = answers,
+            requiredActions = setOf(PokerAction.CALL, PokerAction.THREE_BET, PokerAction.FOLD),
+        )
+
+        assertTrue(mastery.isMastered)
+        assertEquals(5, MasteryCalculator.requiredDistinctFor(actionCount = 3))
+    }
+
     private fun buildAnswers(correctCount: Int): List<AnswerSnapshot> {
         val openHands = listOf("AA", "KK", "QQ", "JJ", "TT", "99", "AKs", "AQs", "AJs", "KQs", "A8s", "A2o", "87o", "54s", "76s")
         val foldHands = listOf("72o", "82o", "92o", "T2o", "J2o", "Q2o", "K2o", "32o", "42o", "52o", "62o", "73o", "83o", "93o", "T3o")

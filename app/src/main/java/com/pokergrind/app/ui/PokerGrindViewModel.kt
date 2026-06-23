@@ -61,6 +61,8 @@ class PokerGrindViewModel(application: Application) : AndroidViewModel(applicati
     )
     private val statisticsRepository = StatisticsRepository(database.answerDao())
     private val backupManager = BackupManager(application, database, progressStore)
+    val openRanges: List<RangeDefinition> = OpenRanges.open
+    val bbDefenseRanges: List<RangeDefinition> = OpenRanges.bbDefense
     val ranges: List<RangeDefinition> = OpenRanges.all
     private val rangesById = ranges.associateBy(RangeDefinition::id)
     private val btnRange = BtnOpenRange.definition
@@ -69,7 +71,12 @@ class PokerGrindViewModel(application: Application) : AndroidViewModel(applicati
         ranges.map { range ->
             answerRepository
                 .observeRecentAnswers(range.id, MasteryCalculator.WINDOW_SIZE)
-                .map { answers -> range.id to MasteryCalculator.calculate(answers) }
+                .map { answers ->
+                    range.id to MasteryCalculator.calculate(
+                        recentAnswers = answers,
+                        requiredActions = range.availableActions.toSet(),
+                    )
+                }
         },
     ) { masteryPairs ->
         masteryPairs.toMap()

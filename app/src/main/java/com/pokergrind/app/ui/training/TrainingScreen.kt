@@ -181,7 +181,11 @@ private fun ColumnScope.QuestionContent(
         Spacer(Modifier.height(4.dp))
         PokerTable(activePosition = range.position)
         Text(
-            text = "À toi de parler · ${range.position} · ${range.stackDepthBb} BB",
+            text = range.spotContext,
+            color = TextSecondary,
+        )
+        Text(
+            text = range.decisionPrompt,
             color = TextSecondary,
         )
 
@@ -211,22 +215,25 @@ private fun ColumnScope.QuestionContent(
     if (selectedAction == null) {
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            ActionButton(
-                label = "Fold",
-                modifier = Modifier.weight(1f),
-                containerColor = SurfaceElevated,
-                contentColor = MaterialTheme.colorScheme.onSurface,
-                onClick = { onAnswer(PokerAction.FOLD, elapsedSeconds * 1_000L) },
-            )
-            ActionButton(
-                label = "Open 2,5 BB",
-                modifier = Modifier.weight(1f),
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary,
-                onClick = { onAnswer(PokerAction.OPEN, elapsedSeconds * 1_000L) },
-            )
+            range.availableActions.forEach { action ->
+                ActionButton(
+                    label = range.actionButtonLabel(action),
+                    modifier = Modifier.weight(1f),
+                    containerColor = if (action == PokerAction.FOLD) {
+                        SurfaceElevated
+                    } else {
+                        MaterialTheme.colorScheme.primary
+                    },
+                    contentColor = if (action == PokerAction.FOLD) {
+                        MaterialTheme.colorScheme.onSurface
+                    } else {
+                        MaterialTheme.colorScheme.onPrimary
+                    },
+                    onClick = { onAnswer(action, elapsedSeconds * 1_000L) },
+                )
+            }
         }
     } else {
         Surface(
@@ -245,10 +252,7 @@ private fun ColumnScope.QuestionContent(
                     style = MaterialTheme.typography.headlineMedium,
                 )
                 Text(
-                    text = when (expectedAction) {
-                        PokerAction.OPEN -> "La bonne action est Open 2,5 BB."
-                        PokerAction.FOLD -> "La bonne action est Fold."
-                    },
+                    text = "La bonne action est ${range.feedbackActionLabel(expectedAction)}.",
                     color = MaterialTheme.colorScheme.onSurface,
                 )
                 Spacer(Modifier.height(14.dp))
@@ -260,7 +264,7 @@ private fun ColumnScope.QuestionContent(
                             .height(60.dp),
                         shape = RoundedCornerShape(16.dp),
                     ) {
-                        Text("Voir la range", maxLines = 1, fontSize = 15.sp)
+                        Text("Voir range", maxLines = 1, fontSize = 15.sp)
                     }
                     Button(
                         onClick = onNext,
@@ -294,9 +298,25 @@ private fun ActionButton(
             contentColor = contentColor,
         ),
     ) {
-        Text(label)
+        Text(label, maxLines = 1, fontSize = 14.sp)
     }
 }
+
+private fun RangeDefinition.actionButtonLabel(action: PokerAction): String =
+    when (action) {
+        PokerAction.OPEN -> "Open 2,5 BB"
+        PokerAction.CALL -> "Call"
+        PokerAction.THREE_BET -> "3-bet"
+        PokerAction.FOLD -> "Fold"
+    }
+
+private fun RangeDefinition.feedbackActionLabel(action: PokerAction): String =
+    when (action) {
+        PokerAction.OPEN -> "Open 2,5 BB"
+        PokerAction.CALL -> "Call"
+        PokerAction.THREE_BET -> "3-bet"
+        PokerAction.FOLD -> "Fold"
+    }
 
 @Composable
 private fun SessionSummary(

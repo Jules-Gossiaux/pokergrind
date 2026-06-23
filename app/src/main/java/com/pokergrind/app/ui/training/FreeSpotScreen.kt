@@ -19,6 +19,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.pokergrind.app.domain.model.RangeChapter
 import com.pokergrind.app.domain.model.RangeDefinition
 import com.pokergrind.app.ui.theme.SurfaceElevated
 import com.pokergrind.app.ui.theme.TextSecondary
@@ -56,7 +57,7 @@ fun FreeSpotScreen(
                 val enabled = range.id in unlockedSpotIds
                 SpotCard(
                     title = range.title,
-                    subtitle = if (enabled) "100 BB · Open 2,5 BB" else "Verrouillé",
+                    subtitle = if (enabled) range.shortDescription() else "Verrouillé",
                     enabled = enabled,
                     onClick = { onSelectSpot(range.id) },
                 )
@@ -76,6 +77,13 @@ fun FreeSpotScreen(
         }
     }
 }
+
+private fun RangeDefinition.shortDescription(): String =
+    when (chapter) {
+        RangeChapter.OPENS -> "${stackDepthBb} BB · Open 2,5 BB"
+        RangeChapter.BB_DEFENSES -> "BTN open 2,5 BB · Call / 3-bet / Fold"
+        RangeChapter.THREE_BETS -> "${stackDepthBb} BB · 3-bet"
+    }
 
 @Composable
 private fun SpotCard(

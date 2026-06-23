@@ -20,15 +20,16 @@ La notation stockée est normalisée avec la carte la plus haute en premier.
 Actions actuellement implémentées par le domaine :
 
 - `OPEN`
+- `CALL`
+- `THREE_BET`
 - `FOLD`
 
 Actions prévues pour les prochains modules :
 
-- `CALL`
-- `THREE_BET`
 - `FOUR_BET`
 
-Le premier module n'utilise que `OPEN` et `FOLD`.
+Les open ranges utilisent `OPEN` et `FOLD`. Les défenses BB utilisent
+`CALL`, `THREE_BET` et `FOLD`.
 
 ### Spot
 

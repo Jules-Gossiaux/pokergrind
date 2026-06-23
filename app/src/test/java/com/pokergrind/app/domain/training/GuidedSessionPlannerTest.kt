@@ -1,6 +1,7 @@
 package com.pokergrind.app.domain.training
 
 import com.pokergrind.app.data.BtnOpenRange
+import com.pokergrind.app.data.BbVsBtnDefenseRange
 import com.pokergrind.app.data.CoOpenRange
 import kotlin.random.Random
 import org.junit.Assert.assertEquals
@@ -67,5 +68,21 @@ class GuidedSessionPlannerTest {
         assertEquals(20, session.size)
         assertTrue(counts.getValue(btn.id) >= 4)
         assertTrue(counts.getValue(co.id) >= 4)
+    }
+
+    @Test
+    fun `mixed two action and three action ranges stay capped to daily session size`() {
+        val session = GuidedSessionPlanner.plan(
+            ranges = listOf(
+                BtnOpenRange.definition,
+                CoOpenRange.definition,
+                BbVsBtnDefenseRange.definition,
+            ),
+            reviewStates = emptyMap(),
+            nowEpochMillis = 10_000,
+            random = Random(11),
+        )
+
+        assertEquals(20, session.size)
     }
 }

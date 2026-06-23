@@ -33,10 +33,9 @@ object GuidedSessionPlanner {
         val selected = mutableListOf<ReviewCandidate>()
         val minimumPerSpot = (SessionFactory.DAILY_SESSION_SIZE / ranges.size)
             .coerceAtMost(MINIMUM_PER_SPOT)
-        val minimumPerAction = minimumPerSpot / PokerAction.entries.size
-
         ranges.forEach { range ->
-            PokerAction.entries.forEach { action ->
+            val minimumPerAction = (minimumPerSpot / range.availableActions.size).coerceAtLeast(1)
+            range.availableActions.forEach { action ->
                 selected += candidates
                     .filter { it.spotId == range.id && it.action == action }
                     .shuffled(random)
@@ -46,9 +45,11 @@ object GuidedSessionPlanner {
         }
 
         val selectedKeys = selected.map { it.spotId to it.hand.notation }.toMutableSet()
-        val targetPerAction = SessionFactory.DAILY_SESSION_SIZE / PokerAction.entries.size
-        PokerAction.entries.forEach { action ->
+        val allActions = ranges.flatMap { it.availableActions }.distinct()
+        val targetPerAction = (SessionFactory.DAILY_SESSION_SIZE / allActions.size).coerceAtLeast(1)
+        allActions.forEach { action ->
             val remainingForAction = targetPerAction - selected.count { it.action == action }
+            if (remainingForAction <= 0) return@forEach
             val additions = candidates
                 .filter { it.action == action && (it.spotId to it.hand.notation) !in selectedKeys }
                 .shuffled(random)
@@ -59,6 +60,9 @@ object GuidedSessionPlanner {
         }
 
         return selected
+            .distinctBy { it.spotId to it.hand.notation }
+            .sortedByDescending { priority(it.review, nowEpochMillis) }
+            .take(SessionFactory.DAILY_SESSION_SIZE)
             .shuffled(random)
             .map { it.spotId to it.hand }
     }

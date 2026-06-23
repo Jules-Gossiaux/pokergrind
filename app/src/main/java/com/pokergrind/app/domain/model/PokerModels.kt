@@ -2,6 +2,8 @@ package com.pokergrind.app.domain.model
 
 enum class PokerAction(val label: String) {
     OPEN("Open"),
+    CALL("Call"),
+    THREE_BET("3-bet"),
     FOLD("Fold"),
 }
 
@@ -37,6 +39,10 @@ data class RangeDefinition(
     val stackDepthBb: Int,
     val sizingBb: Double,
     val entries: List<RangeEntry>,
+    val chapter: RangeChapter = RangeChapter.OPENS,
+    val spotContext: String = "À toi de parler",
+    val decisionPrompt: String = "100 BB",
+    val actionOrder: List<PokerAction> = listOf(PokerAction.FOLD, PokerAction.OPEN),
 ) {
     init {
         require(entries.size == 169) { "Une range doit contenir exactement 169 catégories." }
@@ -56,7 +62,24 @@ data class RangeDefinition(
     fun actionFor(hand: HandCategory): PokerAction =
         entries.first { it.hand.notation == hand.notation }.action
 
+    fun comboCountFor(action: PokerAction): Int =
+        entries
+            .filter { it.action == action }
+            .sumOf { it.hand.comboCount }
+
+    fun percentageFor(action: PokerAction): Double =
+        comboCountFor(action).toDouble() / TOTAL_PREFLOP_COMBOS * 100
+
+    val availableActions: List<PokerAction>
+        get() = actionOrder.filter { action -> entries.any { it.action == action } }
+
     companion object {
         const val TOTAL_PREFLOP_COMBOS = 1326
     }
+}
+
+enum class RangeChapter {
+    OPENS,
+    BB_DEFENSES,
+    THREE_BETS,
 }

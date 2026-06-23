@@ -47,7 +47,7 @@ Hiérarchie proposée :
 3. main en très grand ;
 4. temps discret ;
 5. deux grands boutons d'action ;
-6. feedback compact et bouton `Voir la range`.
+6. feedback compact et bouton `Voir range`.
 
 La matrice de range est reconstruite en Compose à partir des 169 entrées. Elle
 doit rester lisible en plein écran et permettre d'identifier la main courante.
