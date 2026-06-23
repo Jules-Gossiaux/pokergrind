@@ -84,11 +84,13 @@ encore de version publiée.
   moteur.
 - accueil Fondations avec Opens, Défenses BB et 3-bets ;
 - chapitre Opens déroulant directement dans Fondations, sans écran intermédiaire ;
-- premier spot de défense BB (`BB vs BTN`) avec actions `Call`, `3-bet` et `Fold` ;
+- défenses BB avec actions `Call`, `3-bet` et `Fold` ;
 - matrice de range compatible avec plusieurs actions colorées ;
 - roadmap plus compacte, ouverture automatique du chapitre le plus avancé,
   libellé `Mode libre` raccourci et fermeture des ranges par croix ;
 - lancement direct d'un entraînement libre depuis une carte de spot déverrouillée ;
-- conservation documentaire des ranges candidates restantes pour les défenses BB ;
+- intégration complète des cinq défenses BB : BTN, CO, SB, HJ et UTG ;
+- cartes de progression plus compactes malgré les actions `Voir range` et `Jouer` ;
+- réorganisation locale du dossier `ranges/` avec les images d'open dans `ranges/open/` ;
 - export JSON et restauration locale de Room, DataStore et sessions en cours ;
 - signature release explicitement reportée pendant la phase de développement.

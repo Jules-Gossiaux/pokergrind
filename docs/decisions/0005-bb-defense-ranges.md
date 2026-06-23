@@ -25,9 +25,13 @@ Les ranges doivent donc être :
 Créer un chapitre `Défenses BB` dans les Fondations, distinct du chapitre
 `Opens`.
 
-Le premier spot intégré est :
+Les spots intégrés sont :
 
 1. `BB vs BTN`, 100 BB, BTN open 2,5 BB.
+2. `BB vs CO`, 100 BB, CO open 2,5 BB.
+3. `BB vs SB`, 100 BB, SB open 2,5 BB.
+4. `BB vs HJ`, 100 BB, HJ open 2,5 BB.
+5. `BB vs UTG`, 100 BB, UTG open 2,5 BB.
 
 Les réponses possibles sont :
 
@@ -91,10 +95,10 @@ Pour les spots à trois actions, la couverture minimale passe à 5 mains
 distinctes par action dans la fenêtre de 30 réponses. Cela évite de valider un
 spot sans avoir réellement rencontré des `Call`, des `3-bet` et des `Fold`.
 
-## Hors périmètre immédiat
+## Autres spots intégrés
 
-Les autres spots sont conservés comme candidats mais ne sont pas codés dans
-ce premier incrément.
+Les spots suivants sont codés dans le même chapitre, après `BB vs BTN`, dans
+l'ordre pédagogique `CO → SB → HJ → UTG`.
 
 ### BB vs UTG open
 

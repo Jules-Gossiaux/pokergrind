@@ -1,7 +1,7 @@
 # Transcription — Open HJ 100 BB
 
 - Identifiant : `open_hj_100bb_v1`
-- Source locale : `ranges/open_UTG+1.png` (nommée MP/UTG+1 dans la source)
+- Source locale : `ranges/open/open_UTG+1.png` (nommée MP/UTG+1 dans la source)
 - Sizing : 2,5 BB
 - Action principale : Open ou Fold
 - Statut : transcrite et vérifiée automatiquement

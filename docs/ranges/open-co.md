@@ -1,7 +1,7 @@
 # Transcription — Open CO 100 BB
 
 - Identifiant : `open_co_100bb_v1`
-- Source locale : `ranges/open_CO.png`
+- Source locale : `ranges/open/open_CO.png`
 - Date de transcription : 2026-06-21
 - Sizing : 2,5 BB
 - Action principale : Open ou Fold

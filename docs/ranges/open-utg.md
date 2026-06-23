@@ -1,7 +1,7 @@
 # Transcription — Open UTG 100 BB
 
 - Identifiant : `open_utg_100bb_v1`
-- Source locale : `ranges/open_UTG.png`
+- Source locale : `ranges/open/open_UTG.png`
 - Sizing : 2,5 BB
 - Action principale : Open ou Fold
 - Statut : transcrite et vérifiée automatiquement

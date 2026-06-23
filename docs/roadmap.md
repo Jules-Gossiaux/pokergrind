@@ -2,11 +2,11 @@
 
 Cette feuille de route décrit l'ordre de travail, sans date de livraison.
 
-## Réalisé — Socle, ranges d'open et premier spot BB
+## Réalisé — Socle, ranges d'open et défenses BB
 
 - application Android Kotlin/Compose et thème sombre ;
 - cinq ranges d'open 6-max : BTN, CO, HJ, UTG et SB ;
-- premier spot de défense BB : BB vs BTN avec `Call`, `3-bet` et `Fold` ;
+- cinq spots de défense BB : BTN, CO, SB, HJ et UTG avec `Call`, `3-bet` et `Fold` ;
 - validation automatique des 169 catégories et des pourcentages sources ;
 - parcours progressif avec déblocages permanents ;
 - sessions guidées multi-spots de 20 questions ;
@@ -33,19 +33,6 @@ Cette feuille de route décrit l'ordre de travail, sans date de livraison.
 
 La signature release est volontairement reportée : pendant le développement,
 l'APK debug reste plus simple à construire, installer et mettre à jour.
-
-## Module suivant — Défenses de grosse blinde
-
-Après stabilisation du premier spot :
-
-1. Défense BB vs CO ;
-2. Défense BB vs SB ;
-3. Défense BB vs HJ ;
-4. Défense BB vs UTG.
-
-Ce module réutilise les actions `Call`, `3-bet` et `Fold`. Il devra continuer à réutiliser
-le moteur de session, de répétition et de statistiques sans ajouter de logique
-spécifique aux opens dans les composants communs.
 
 ## Après les défenses de BB
 

@@ -39,10 +39,10 @@ Un spot verrouillé devient disponible lorsque le spot précédent est maîtris�
 
 L'accueil présente les grands chapitres des Fondations. `Opens` se déplie sur
 la même page pour afficher le parcours détaillé actuel. `Défenses BB` devient
-le chapitre suivant et contient d'abord `BB vs BTN`. `3-bets` reste visible
+le chapitre suivant et contient les cinq spots BB. `3-bets` reste visible
 mais verrouillé tant que son contenu n'est pas développé.
 
-Les cinq ranges d'open sont intégrées. Les sessions guidées
+Les cinq ranges d'open et les cinq défenses BB sont intégrées. Les sessions guidées
 garantissent qu'au moins quatre questions proviennent de chaque range
 débloquée et disponible, avant de consacrer le reste du budget aux révisions
 les plus prioritaires.
@@ -51,16 +51,17 @@ les plus prioritaires.
 
 Après les open ranges :
 
-1. Défense BB vs BTN — premier spot intégré
+1. Défense BB vs BTN
 2. Défense BB vs CO
 3. Défense BB vs SB
-4. 3-bet SB vs BTN
-5. 3-bet BB vs BTN
-6. Défense contre les 3-bets
-7. Récapitulatif général
+4. Défense BB vs HJ
+5. Défense BB vs UTG
+6. 3-bet SB vs BTN
+7. 3-bet BB vs BTN
+8. Défense contre les 3-bets
+9. Récapitulatif général
 
-Cette liste sert à préserver la cohérence de l'architecture. Seul `BB vs BTN`
-est intégré pour l'instant.
+Les cinq défenses BB sont intégrées. Les 3-bets restent hors périmètre.
 
 ## 5. Question d'entraînement
 

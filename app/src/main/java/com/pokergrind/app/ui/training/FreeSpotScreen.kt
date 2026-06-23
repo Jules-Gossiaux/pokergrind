@@ -81,7 +81,7 @@ fun FreeSpotScreen(
 private fun RangeDefinition.shortDescription(): String =
     when (chapter) {
         RangeChapter.OPENS -> "${stackDepthBb} BB · Open 2,5 BB"
-        RangeChapter.BB_DEFENSES -> "BTN open 2,5 BB · Call / 3-bet / Fold"
+        RangeChapter.BB_DEFENSES -> "$spotContext · Call / 3-bet / Fold"
         RangeChapter.THREE_BETS -> "${stackDepthBb} BB · 3-bet"
     }
 

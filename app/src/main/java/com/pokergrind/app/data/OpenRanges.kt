@@ -11,9 +11,7 @@ object OpenRanges {
         SbOpenRange.definition,
     )
 
-    val bbDefense: List<RangeDefinition> = listOf(
-        BbVsBtnDefenseRange.definition,
-    )
+    val bbDefense: List<RangeDefinition> = BbDefenseRanges.all
 
     val all: List<RangeDefinition> = open + bbDefense
 }

@@ -31,32 +31,49 @@ object GuidedSessionPlanner {
         }
 
         val selected = mutableListOf<ReviewCandidate>()
+        val selectedKeys = mutableSetOf<Pair<String, String>>()
+
+        fun addCandidate(candidate: ReviewCandidate) {
+            val key = candidate.spotId to candidate.hand.notation
+            if (selected.size < SessionFactory.DAILY_SESSION_SIZE && selectedKeys.add(key)) {
+                selected += candidate
+            }
+        }
+
+        ranges.forEach { range ->
+            candidates
+                .filter { it.spotId == range.id }
+                .shuffled(random)
+                .sortedByDescending { priority(it.review, nowEpochMillis) }
+                .firstOrNull()
+                ?.let(::addCandidate)
+        }
+
         val minimumPerSpot = (SessionFactory.DAILY_SESSION_SIZE / ranges.size)
             .coerceAtMost(MINIMUM_PER_SPOT)
         ranges.forEach { range ->
             val minimumPerAction = (minimumPerSpot / range.availableActions.size).coerceAtLeast(1)
             range.availableActions.forEach { action ->
-                selected += candidates
+                candidates
                     .filter { it.spotId == range.id && it.action == action }
                     .shuffled(random)
                     .sortedByDescending { priority(it.review, nowEpochMillis) }
                     .take(minimumPerAction)
+                    .forEach(::addCandidate)
             }
         }
 
-        val selectedKeys = selected.map { it.spotId to it.hand.notation }.toMutableSet()
         val allActions = ranges.flatMap { it.availableActions }.distinct()
         val targetPerAction = (SessionFactory.DAILY_SESSION_SIZE / allActions.size).coerceAtLeast(1)
         allActions.forEach { action ->
             val remainingForAction = targetPerAction - selected.count { it.action == action }
             if (remainingForAction <= 0) return@forEach
-            val additions = candidates
+            candidates
                 .filter { it.action == action && (it.spotId to it.hand.notation) !in selectedKeys }
                 .shuffled(random)
                 .sortedByDescending { priority(it.review, nowEpochMillis) }
                 .take(remainingForAction)
-            selected += additions
-            selectedKeys += additions.map { it.spotId to it.hand.notation }
+                .forEach(::addCandidate)
         }
 
         return selected

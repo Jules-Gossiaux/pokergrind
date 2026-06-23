@@ -557,13 +557,15 @@ private fun PathStep(
             ),
             shape = RoundedCornerShape(18.dp),
         ) {
-            Column(
-                modifier = Modifier.padding(horizontal = 14.dp, vertical = 11.dp),
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 14.dp, vertical = 10.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
             ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween,
+                Column(
+                    modifier = Modifier.weight(1f),
                 ) {
                     Text(
                         text = title,
@@ -575,46 +577,47 @@ private fun PathStep(
                         fontWeight = FontWeight.SemiBold,
                         fontSize = 17.sp,
                     )
-                    if (onViewRange != null && onStartFreeSpot != null) {
-                        Column(
-                            horizontalAlignment = Alignment.End,
-                            verticalArrangement = Arrangement.spacedBy(7.dp),
-                        ) {
-                            OutlinedButton(
-                                onClick = onViewRange,
-                                modifier = Modifier.height(36.dp),
-                                shape = RoundedCornerShape(13.dp),
-                                contentPadding = PaddingValues(horizontal = 12.dp),
-                            ) {
-                                Text("Voir range", fontSize = 13.sp, maxLines = 1)
-                            }
-                            Button(
-                                onClick = onStartFreeSpot,
-                                modifier = Modifier.height(36.dp),
-                                shape = RoundedCornerShape(13.dp),
-                                contentPadding = PaddingValues(horizontal = 14.dp),
-                            ) {
-                                Text("Jouer", fontSize = 13.sp, maxLines = 1)
-                            }
-                        }
+                    Spacer(Modifier.height(7.dp))
+                    Text(
+                        text = subtitle,
+                        color = if (isActive || isUnlocked) {
+                            MaterialTheme.colorScheme.primary
+                        } else {
+                            TextSecondary.copy(alpha = 0.65f)
+                        },
+                        fontSize = 14.sp,
+                    )
+                    if (unlockHint != null) {
+                        Spacer(Modifier.height(5.dp))
+                        Text(
+                            text = unlockHint,
+                            color = TextSecondary,
+                            fontSize = 12.sp,
+                        )
                     }
                 }
-                Text(
-                    text = subtitle,
-                    color = if (isActive || isUnlocked) {
-                        MaterialTheme.colorScheme.primary
-                    } else {
-                        TextSecondary.copy(alpha = 0.65f)
-                    },
-                    fontSize = 14.sp,
-                )
-                if (unlockHint != null) {
-                    Spacer(Modifier.height(5.dp))
-                    Text(
-                        text = unlockHint,
-                        color = TextSecondary,
-                        fontSize = 12.sp,
-                    )
+                if (onViewRange != null && onStartFreeSpot != null) {
+                    Column(
+                        horizontalAlignment = Alignment.End,
+                        verticalArrangement = Arrangement.spacedBy(6.dp),
+                    ) {
+                        OutlinedButton(
+                            onClick = onViewRange,
+                            modifier = Modifier.height(34.dp),
+                            shape = RoundedCornerShape(13.dp),
+                            contentPadding = PaddingValues(horizontal = 11.dp),
+                        ) {
+                            Text("Voir range", fontSize = 12.sp, maxLines = 1)
+                        }
+                        Button(
+                            onClick = onStartFreeSpot,
+                            modifier = Modifier.height(34.dp),
+                            shape = RoundedCornerShape(13.dp),
+                            contentPadding = PaddingValues(horizontal = 16.dp),
+                        ) {
+                            Text("Jouer", fontSize = 12.sp, maxLines = 1)
+                        }
+                    }
                 }
             }
         }
@@ -633,7 +636,7 @@ private fun masteryLabel(mastery: SpotMastery): String = when {
 private fun RangeDefinition.shortDescription(): String =
     when (chapter) {
         com.pokergrind.app.domain.model.RangeChapter.OPENS -> "${stackDepthBb} BB · Open 2,5 BB"
-        com.pokergrind.app.domain.model.RangeChapter.BB_DEFENSES -> "BTN open 2,5 BB · Call / 3-bet / Fold"
+        com.pokergrind.app.domain.model.RangeChapter.BB_DEFENSES -> "$spotContext · Call / 3-bet / Fold"
         com.pokergrind.app.domain.model.RangeChapter.THREE_BETS -> "${stackDepthBb} BB · 3-bet"
     }
 
