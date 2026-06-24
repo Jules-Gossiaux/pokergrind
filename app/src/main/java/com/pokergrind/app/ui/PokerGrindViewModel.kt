@@ -128,6 +128,26 @@ class PokerGrindViewModel(application: Application) : AndroidViewModel(applicati
         }
     }
 
+    fun startGlobalFreeSession(replaceExisting: Boolean = false) {
+        val currentFreeSession = uiState.value.freeSession
+        val availableRanges = ranges.filter { it.id in uiState.value.unlockedSpotIds }
+            .ifEmpty { listOf(btnRange) }
+        val currentIsGlobal = currentFreeSession?.isGlobalFor(availableRanges) == true
+        if (currentFreeSession?.isComplete == false && currentIsGlobal && !replaceExisting) return
+
+        viewModelScope.launch {
+            val reviewStates = answerRepository.reviewStates(availableRanges.map(RangeDefinition::id))
+            val questions = GuidedSessionPlanner.plan(
+                ranges = availableRanges,
+                reviewStates = reviewStates,
+                nowEpochMillis = System.currentTimeMillis(),
+            ).map { (spotId, hand) ->
+                StoredQuestion(spotId = spotId, handNotation = hand.notation)
+            }
+            progressStore.startSession(TrainingMode.FREE, questions)
+        }
+    }
+
     fun startFreeSession(spotId: String, replaceExisting: Boolean = false) {
         val currentFreeSession = uiState.value.freeSession
         if (currentFreeSession?.isComplete == false) {
@@ -210,4 +230,9 @@ class PokerGrindViewModel(application: Application) : AndroidViewModel(applicati
         statistics = statistics,
         reviewStates = reviewStates,
     )
+
+    private fun StoredTrainingSession.isGlobalFor(availableRanges: List<RangeDefinition>): Boolean {
+        val distinctSessionSpots = questions.map(StoredQuestion::spotId).distinct().size
+        return availableRanges.size <= 1 || distinctSessionSpots > 1
+    }
 }

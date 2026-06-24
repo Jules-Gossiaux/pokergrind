@@ -92,5 +92,7 @@ encore de version publiée.
 - intégration complète des cinq défenses BB : BTN, CO, SB, HJ et UTG ;
 - cartes de progression plus compactes malgré les actions `Voir range` et `Jouer` ;
 - réorganisation locale du dossier `ranges/` avec les images d'open dans `ranges/open/` ;
+- correction du mode libre global : le bouton `Mode libre` mélange les spots
+  déverrouillés même après un entraînement ciblé lancé depuis `Jouer` ;
 - export JSON et restauration locale de Room, DataStore et sessions en cours ;
 - signature release explicitement reportée pendant la phase de développement.
