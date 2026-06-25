@@ -79,18 +79,6 @@ class ProgressStore(private val context: Context) {
         }
     }
 
-    suspend fun discardSession(mode: TrainingMode) {
-        context.progressDataStore.edit { preferences ->
-            val keys = keysFor(mode)
-            preferences.remove(keys.id)
-            preferences.remove(keys.questions)
-            preferences.remove(keys.index)
-            preferences.remove(keys.correct)
-            preferences.remove(keys.selectedAction)
-            if (legacyMode(preferences) == mode) clearLegacySession(preferences)
-        }
-    }
-
     suspend fun answer(mode: TrainingMode, action: PokerAction, isCorrect: Boolean) {
         context.progressDataStore.edit { preferences ->
             val keys = activeKeys(preferences, mode)

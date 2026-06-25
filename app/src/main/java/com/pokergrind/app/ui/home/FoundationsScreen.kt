@@ -287,7 +287,6 @@ fun FoundationsScreen(
         if (opensExpanded || bbDefenseExpanded) {
             FoundationActions(
                 guidedSession = guidedSession,
-                freeSession = freeSession,
                 onStartTraining = onStartTraining,
                 onOpenFreeTraining = onOpenFreeTraining,
                 onOpenStatistics = onOpenStatistics,
@@ -409,7 +408,6 @@ private fun TrainingPath(
 @Composable
 private fun FoundationActions(
     guidedSession: StoredTrainingSession?,
-    freeSession: StoredTrainingSession?,
     onStartTraining: () -> Unit,
     onOpenFreeTraining: () -> Unit,
     onOpenStatistics: () -> Unit,
@@ -446,11 +444,7 @@ private fun FoundationActions(
                 shape = RoundedCornerShape(16.dp),
             ) {
                 Text(
-                    if (freeSession != null) {
-                        "Mode libre"
-                    } else {
-                        "Mode libre"
-                    },
+                    "Mode libre",
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )

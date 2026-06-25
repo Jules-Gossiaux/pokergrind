@@ -31,9 +31,6 @@ interface AnswerDao {
     )
     fun observeRecent(spotId: String, limit: Int): Flow<List<AnswerEntity>>
 
-    @Query("SELECT COUNT(*) FROM answers WHERE mode = 'FREE'")
-    fun observeFreeAnswerCount(): Flow<Int>
-
     @Query(
         """
         SELECT

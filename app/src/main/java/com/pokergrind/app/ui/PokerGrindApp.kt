@@ -23,12 +23,10 @@ import com.pokergrind.app.data.BtnOpenRange
 import com.pokergrind.app.domain.training.TrainingMode
 import com.pokergrind.app.ui.home.FoundationsScreen
 import com.pokergrind.app.ui.statistics.StatisticsScreen
-import com.pokergrind.app.ui.training.FreeSpotScreen
 import com.pokergrind.app.ui.training.TrainingScreen
 
 private enum class Destination {
     FOUNDATIONS,
-    FREE_SPOT,
     STATISTICS,
     TRAINING,
 }
@@ -66,7 +64,6 @@ fun PokerGrindApp(viewModel: PokerGrindViewModel = viewModel()) {
 
     BackHandler(enabled = destination != Destination.FOUNDATIONS) {
         destination = when (destination) {
-            Destination.FREE_SPOT,
             Destination.STATISTICS,
             Destination.TRAINING,
             -> Destination.FOUNDATIONS
@@ -131,18 +128,6 @@ fun PokerGrindApp(viewModel: PokerGrindViewModel = viewModel()) {
                     exportLauncher.launch("pokergrind-backup-${java.time.LocalDate.now()}.json")
                 },
                 onImportBackup = { importLauncher.launch(arrayOf("application/json", "text/plain")) },
-            )
-
-            Destination.FREE_SPOT -> FreeSpotScreen(
-                ranges = viewModel.ranges,
-                unlockedSpotIds = uiState.unlockedSpotIds,
-                freeAnswerCount = uiState.statistics.freeSpotStats.sumOf { it.answerCount },
-                onSelectSpot = { spotId ->
-                    viewModel.startFreeSession(spotId)
-                    trainingMode = TrainingMode.FREE
-                    destination = Destination.TRAINING
-                },
-                onBack = { destination = Destination.FOUNDATIONS },
             )
 
             Destination.STATISTICS -> StatisticsScreen(

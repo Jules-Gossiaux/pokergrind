@@ -94,5 +94,7 @@ encore de version publiée.
 - réorganisation locale du dossier `ranges/` avec les images d'open dans `ranges/open/` ;
 - correction du mode libre global : le bouton `Mode libre` mélange les spots
   déverrouillés même après un entraînement ciblé lancé depuis `Jouer` ;
+- nettoyage du code mort après stabilisation de la première étape du MVP :
+  suppression de l'ancien écran de choix libre et de méthodes non utilisées ;
 - export JSON et restauration locale de Room, DataStore et sessions en cours ;
 - signature release explicitement reportée pendant la phase de développement.

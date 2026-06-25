@@ -37,8 +37,6 @@ class AnswerRepository(
     fun observeUnlockedSpotIds(): Flow<Set<String>> =
         spotUnlockDao.observeUnlockedSpotIds().map(List<String>::toSet)
 
-    fun observeFreeAnswerCount(): Flow<Int> = answerDao.observeFreeAnswerCount()
-
     fun observeReviewStates(): Flow<Map<Pair<String, String>, ReviewState>> =
         reviewDao.observeAll().map { entities ->
             entities.associate { entity ->

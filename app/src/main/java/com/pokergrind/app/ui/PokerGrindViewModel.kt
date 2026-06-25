@@ -41,9 +41,6 @@ data class PokerGrindUiState(
     val statistics: StatisticsSnapshot = StatisticsSnapshot(),
     val reviewStates: Map<Pair<String, String>, ReviewState> = emptyMap(),
 ) {
-    val btnMastery: SpotMastery
-        get() = masteryBySpot[BtnOpenRange.definition.id] ?: MasteryCalculator.empty
-
     fun sessionFor(mode: TrainingMode): StoredTrainingSession? = when (mode) {
         TrainingMode.GUIDED -> guidedSession
         TrainingMode.FREE -> freeSession
