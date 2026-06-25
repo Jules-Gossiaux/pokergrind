@@ -105,7 +105,9 @@ fun PokerGrindApp(viewModel: PokerGrindViewModel = viewModel()) {
                     viewModel.bbDefenseRanges.any { it.id == id }
                 },
                 guidedSession = uiState.guidedSession?.takeUnless { it.isComplete },
-                freeSession = uiState.freeSession?.takeUnless { it.isComplete },
+                freeSession = uiState.freeSpotSession
+                    ?.takeUnless { it.isComplete }
+                    ?: uiState.freeSession?.takeUnless { it.isComplete },
                 masteryBySpot = uiState.masteryBySpot,
                 unlockedSpotIds = uiState.unlockedSpotIds,
                 onStartTraining = {
@@ -120,7 +122,7 @@ fun PokerGrindApp(viewModel: PokerGrindViewModel = viewModel()) {
                 },
                 onStartFreeSpot = { spotId ->
                     viewModel.startFreeSession(spotId, replaceExisting = true)
-                    trainingMode = TrainingMode.FREE
+                    trainingMode = TrainingMode.FREE_SPOT
                     destination = Destination.TRAINING
                 },
                 onOpenStatistics = { destination = Destination.STATISTICS },
@@ -149,17 +151,15 @@ fun PokerGrindApp(viewModel: PokerGrindViewModel = viewModel()) {
                 onRestart = {
                     when (trainingMode) {
                         TrainingMode.FREE -> {
-                            val freeSpotIds = uiState.freeSession
+                            viewModel.startGlobalFreeSession(replaceExisting = true)
+                        }
+                        TrainingMode.FREE_SPOT -> {
+                            val spotId = uiState.freeSpotSession
                                 ?.questions
-                                ?.map { it.spotId }
-                                ?.distinct()
-                                .orEmpty()
-                            if (freeSpotIds.size > 1) {
-                                viewModel.startGlobalFreeSession(replaceExisting = true)
-                            } else {
-                                val spotId = freeSpotIds.firstOrNull() ?: BtnOpenRange.definition.id
-                                viewModel.startFreeSession(spotId, replaceExisting = true)
-                            }
+                                ?.firstOrNull()
+                                ?.spotId
+                                ?: BtnOpenRange.definition.id
+                            viewModel.startFreeSession(spotId, replaceExisting = true)
                         }
                         else -> viewModel.startGuidedSession()
                     }

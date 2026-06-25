@@ -356,7 +356,7 @@ private fun SessionSummary(
             color = Progress,
             fontWeight = FontWeight.SemiBold,
         )
-        if (mode == TrainingMode.FREE) {
+        if (mode == TrainingMode.FREE || mode == TrainingMode.FREE_SPOT) {
             Spacer(Modifier.height(8.dp))
             Text(
                 "Les erreurs ont été ajoutées aux priorités du guidé.",

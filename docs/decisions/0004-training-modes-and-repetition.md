@@ -20,7 +20,8 @@ en pratique libre constitue un signal utile pour l'entraîneur.
 - un spot débloqué reste débloqué, même s'il passe ensuite à consolider ;
 - les sessions guidées restent limitées à 20 questions et peuvent être
   répétées plusieurs fois par jour.
-- DataStore conserve une session guidée et une session libre indépendantes ;
+- DataStore conserve une session guidée, une session libre globale et une
+  session libre ciblée indépendantes ;
 - passer d'un mode à l'autre met le premier en pause au lieu de l'écraser.
 
 ## Conséquences

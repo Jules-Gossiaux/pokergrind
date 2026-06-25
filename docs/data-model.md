@@ -91,24 +91,30 @@ Dans l'implémentation Room, la clé primaire combine l'identifiant de session e
 l'index de la question. Une même question ne peut donc pas être enregistrée
 deux fois, même après un double appui ou une reprise.
 
-Chaque réponse possède également un mode `GUIDED` ou `FREE`. Les requêtes de
-maîtrise filtrent explicitement le mode guidé.
+Chaque réponse possède également un mode statistique `GUIDED` ou `FREE`. Les
+sessions libres globales et ciblées sont toutes deux enregistrées comme
+réponses `FREE`, afin de conserver des statistiques libres unifiées. Les
+requêtes de maîtrise filtrent explicitement le mode guidé.
 
 ### TrainingSession
 
 L'état persistant actuel contient :
 
 - identifiant de session ;
-- mode `GUIDED` ou `FREE` ;
+- mode `GUIDED`, `FREE` ou `FREE_SPOT` ;
 - liste ordonnée des 20 questions ;
 - index courant ;
 - nombre de bonnes réponses ;
 - action sélectionnée sur la question courante.
 
 Une série quotidienne n'est mise à jour qu'à la fin d'une session quotidienne
-complète. DataStore conserve deux emplacements indépendants, un pour la session
-guidée et un pour la session libre. Les deux modes peuvent donc être suspendus
-et repris sans s'écraser.
+complète. DataStore conserve trois emplacements indépendants :
+
+- session guidée ;
+- session libre globale ;
+- session libre ciblée sur un spot.
+
+Ces sessions peuvent donc être suspendues et reprises sans s'écraser.
 
 ### SpotProgress
 

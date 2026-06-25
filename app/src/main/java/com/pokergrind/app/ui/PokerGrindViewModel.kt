@@ -36,6 +36,7 @@ data class PokerGrindUiState(
     val streak: Int = 0,
     val guidedSession: StoredTrainingSession? = null,
     val freeSession: StoredTrainingSession? = null,
+    val freeSpotSession: StoredTrainingSession? = null,
     val masteryBySpot: Map<String, SpotMastery> = emptyMap(),
     val unlockedSpotIds: Set<String> = emptySet(),
     val statistics: StatisticsSnapshot = StatisticsSnapshot(),
@@ -44,6 +45,7 @@ data class PokerGrindUiState(
     fun sessionFor(mode: TrainingMode): StoredTrainingSession? = when (mode) {
         TrainingMode.GUIDED -> guidedSession
         TrainingMode.FREE -> freeSession
+        TrainingMode.FREE_SPOT -> freeSpotSession
     }
 }
 
@@ -129,8 +131,7 @@ class PokerGrindViewModel(application: Application) : AndroidViewModel(applicati
         val currentFreeSession = uiState.value.freeSession
         val availableRanges = ranges.filter { it.id in uiState.value.unlockedSpotIds }
             .ifEmpty { listOf(btnRange) }
-        val currentIsGlobal = currentFreeSession?.isGlobalFor(availableRanges) == true
-        if (currentFreeSession?.isComplete == false && currentIsGlobal && !replaceExisting) return
+        if (currentFreeSession?.isComplete == false && !replaceExisting) return
 
         viewModelScope.launch {
             val reviewStates = answerRepository.reviewStates(availableRanges.map(RangeDefinition::id))
@@ -146,7 +147,7 @@ class PokerGrindViewModel(application: Application) : AndroidViewModel(applicati
     }
 
     fun startFreeSession(spotId: String, replaceExisting: Boolean = false) {
-        val currentFreeSession = uiState.value.freeSession
+        val currentFreeSession = uiState.value.freeSpotSession
         if (currentFreeSession?.isComplete == false) {
             val currentSpotId = currentFreeSession.questions.firstOrNull()?.spotId
             if (!replaceExisting || currentSpotId == spotId) return
@@ -155,7 +156,7 @@ class PokerGrindViewModel(application: Application) : AndroidViewModel(applicati
         if (spotId !in uiState.value.unlockedSpotIds) return
         viewModelScope.launch {
             progressStore.startSession(
-                mode = TrainingMode.FREE,
+                mode = TrainingMode.FREE_SPOT,
                 questions = SessionFactory.createBalancedSession(range).map { hand ->
                     StoredQuestion(spotId = range.id, handNotation = hand.notation)
                 },
@@ -222,14 +223,11 @@ class PokerGrindViewModel(application: Application) : AndroidViewModel(applicati
         streak = streak,
         guidedSession = guidedSession,
         freeSession = freeSession,
+        freeSpotSession = freeSpotSession,
         masteryBySpot = masteryBySpot,
         unlockedSpotIds = unlockedSpotIds,
         statistics = statistics,
         reviewStates = reviewStates,
     )
 
-    private fun StoredTrainingSession.isGlobalFor(availableRanges: List<RangeDefinition>): Boolean {
-        val distinctSessionSpots = questions.map(StoredQuestion::spotId).distinct().size
-        return availableRanges.size <= 1 || distinctSessionSpots > 1
-    }
 }

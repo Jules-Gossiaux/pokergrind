@@ -69,10 +69,10 @@ class AnswerRepository(
         val isCorrect = expectedAction == chosenAction
         val now = System.currentTimeMillis()
         val insertedId = answerDao.insert(
-            AnswerEntity(
-                sessionId = session.id,
-                questionIndex = session.questionIndex,
-                mode = session.mode.name,
+                AnswerEntity(
+                    sessionId = session.id,
+                    questionIndex = session.questionIndex,
+                    mode = session.mode.answerModeName(),
                 spotId = spotId,
                 handNotation = handNotation,
                 expectedAction = expectedAction.name,
@@ -112,7 +112,7 @@ class AnswerRepository(
         isCorrect: Boolean,
         nowEpochMillis: Long,
     ) {
-        if (mode == TrainingMode.FREE && isCorrect) return
+        if (mode.isFree() && isCorrect) return
         val current = reviewDao.get(spotId, handNotation)?.toDomain()
         val updated = when (mode) {
             TrainingMode.GUIDED -> SpacedRepetition.afterGuidedAnswer(
@@ -121,7 +121,9 @@ class AnswerRepository(
                 nowEpochMillis = nowEpochMillis,
             )
 
-            TrainingMode.FREE -> SpacedRepetition.afterFreeError(
+            TrainingMode.FREE,
+            TrainingMode.FREE_SPOT,
+            -> SpacedRepetition.afterFreeError(
                 current = current,
                 nowEpochMillis = nowEpochMillis,
             )
@@ -138,6 +140,12 @@ private fun ReviewItemEntity.toDomain() = ReviewState(
     priorityBoost = priorityBoost,
     lastReviewedAtEpochMillis = lastReviewedAtEpochMillis,
 )
+
+private fun TrainingMode.isFree(): Boolean =
+    this == TrainingMode.FREE || this == TrainingMode.FREE_SPOT
+
+private fun TrainingMode.answerModeName(): String =
+    if (isFree()) TrainingMode.FREE.name else name
 
 private fun ReviewState.toEntity(spotId: String, handNotation: String) = ReviewItemEntity(
     spotId = spotId,

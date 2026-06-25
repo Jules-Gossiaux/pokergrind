@@ -96,5 +96,6 @@ encore de version publiée.
   déverrouillés même après un entraînement ciblé lancé depuis `Jouer` ;
 - nettoyage du code mort après stabilisation de la première étape du MVP :
   suppression de l'ancien écran de choix libre et de méthodes non utilisées ;
+- séparation persistante entre session libre globale et session libre ciblée ;
 - export JSON et restauration locale de Room, DataStore et sessions en cours ;
 - signature release explicitement reportée pendant la phase de développement.

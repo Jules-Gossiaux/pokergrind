@@ -13,7 +13,8 @@ Cette feuille de route décrit l'ordre de travail, sans date de livraison.
 - entraînement libre ciblé sur un spot débloqué ;
 - répétition espacée par couple spot-main ;
 - reprise des sessions guidées, XP et série quotidienne ;
-- reprise indépendante et simultanée des sessions guidée et libre ;
+- reprise indépendante et simultanée des sessions guidée, libre globale et
+  libre ciblée ;
 - stockage Room et DataStore avec migrations versionnées ;
 - table 6-max native et matrices de ranges reconstruites ;
 - consultation d'une range depuis l'accueil ou après une réponse ;

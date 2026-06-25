@@ -102,14 +102,15 @@ bloc guidé terminé entretient la série du jour.
 ### Entraînement libre
 
 - blocs de 20 questions répétables ;
-- choix parmi les spots débloqués dont la range est disponible ;
+- le bouton global **Mode libre** mélange les spots débloqués disponibles ;
+- le bouton **Jouer** d'une carte lance une session libre ciblée sur ce spot ;
 - une bonne réponse rapporte de l'XP et alimente les statistiques libres ;
 - une bonne réponse ne compte pas dans les 30 réponses de maîtrise ;
 - une erreur rend la main prioritaire dans les futures sessions guidées ;
 - il ne remplace pas la session guidée pour la série.
 - quitter une session libre la met en pause ;
-- une session guidée et une session libre peuvent rester en cours
-  simultanément ;
+- une session guidée, une session libre globale et une session libre ciblée
+  peuvent rester en cours simultanément ;
 - chaque mode reprend son index, son score et son feedback indépendamment.
 
 ## 7. Maîtrise d'un spot

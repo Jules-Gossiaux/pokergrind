@@ -69,6 +69,7 @@ class BackupManager(
         .put("lastCompletedDate", lastCompletedDate?.toString())
         .put("guidedSession", guidedSession?.toJson())
         .put("freeSession", freeSession?.toJson())
+        .put("freeSpotSession", freeSpotSession?.toJson())
 
     private fun StoredTrainingSession.toJson() = JSONObject()
         .put("id", id)
@@ -139,6 +140,7 @@ class BackupManager(
         lastCompletedDate = optString("lastCompletedDate").takeIf(String::isNotBlank)?.let(LocalDate::parse),
         guidedSession = optJSONObject("guidedSession")?.toSession(),
         freeSession = optJSONObject("freeSession")?.toSession(),
+        freeSpotSession = optJSONObject("freeSpotSession")?.toSession(),
     )
 
     private fun JSONObject.toSession() = StoredTrainingSession(

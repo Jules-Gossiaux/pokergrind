@@ -44,6 +44,7 @@ data class StoredProgress(
     val lastCompletedDate: LocalDate? = null,
     val guidedSession: StoredTrainingSession? = null,
     val freeSession: StoredTrainingSession? = null,
+    val freeSpotSession: StoredTrainingSession? = null,
 )
 
 class ProgressStore(private val context: Context) {
@@ -76,6 +77,7 @@ class ProgressStore(private val context: Context) {
             progress.lastCompletedDate?.let { preferences[LAST_COMPLETED_DATE] = it.toString() }
             writeSession(preferences, progress.guidedSession)
             writeSession(preferences, progress.freeSession)
+            writeSession(preferences, progress.freeSpotSession)
         }
     }
 
@@ -139,6 +141,7 @@ class ProgressStore(private val context: Context) {
             lastCompletedDate = preferences[LAST_COMPLETED_DATE]?.let(LocalDate::parse),
             guidedSession = sessionFor(preferences, TrainingMode.GUIDED),
             freeSession = sessionFor(preferences, TrainingMode.FREE),
+            freeSpotSession = sessionFor(preferences, TrainingMode.FREE_SPOT),
         )
     }
 
@@ -261,6 +264,12 @@ class ProgressStore(private val context: Context) {
         private val FREE_SESSION_CORRECT = intPreferencesKey("free_session_correct")
         private val FREE_SESSION_SELECTED_ACTION = stringPreferencesKey("free_session_selected_action")
 
+        private val FREE_SPOT_SESSION_ID = stringPreferencesKey("free_spot_session_id")
+        private val FREE_SPOT_SESSION_QUESTIONS = stringPreferencesKey("free_spot_session_questions")
+        private val FREE_SPOT_SESSION_INDEX = intPreferencesKey("free_spot_session_index")
+        private val FREE_SPOT_SESSION_CORRECT = intPreferencesKey("free_spot_session_correct")
+        private val FREE_SPOT_SESSION_SELECTED_ACTION = stringPreferencesKey("free_spot_session_selected_action")
+
         private val LEGACY_KEYS = SessionKeys(
             id = SESSION_ID,
             questions = SESSION_QUESTIONS,
@@ -285,9 +294,18 @@ class ProgressStore(private val context: Context) {
             selectedAction = FREE_SESSION_SELECTED_ACTION,
         )
 
+        private val FREE_SPOT_KEYS = SessionKeys(
+            id = FREE_SPOT_SESSION_ID,
+            questions = FREE_SPOT_SESSION_QUESTIONS,
+            index = FREE_SPOT_SESSION_INDEX,
+            correct = FREE_SPOT_SESSION_CORRECT,
+            selectedAction = FREE_SPOT_SESSION_SELECTED_ACTION,
+        )
+
         private fun keysFor(mode: TrainingMode): SessionKeys = when (mode) {
             TrainingMode.GUIDED -> GUIDED_KEYS
             TrainingMode.FREE -> FREE_KEYS
+            TrainingMode.FREE_SPOT -> FREE_SPOT_KEYS
         }
     }
 }
